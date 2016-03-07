@@ -2,20 +2,16 @@
 
 ## Installation
 
-Open Terminal, ``` cd ~ ``` and paste the codes below.
+Open Terminal, ``` cd ~ ``` and paste the commands below.
 
 ### Install Macports
 
 ```bash
-curl -O https://raw.githubusercontent.com/isezen/OSX-Scripts/master/osx_macports.sh
-chmod +x osx_macports.sh
-sudo ./osx_macports.sh -i
+curl -o inst.sh -L https://git.io/v2pMc && chmod +x inst.sh && sudo ./inst.sh -i && rm inst.sh
 ```
 
 ### Install Sublime Text
 
 ```bash
-curl -O https://raw.githubusercontent.com/isezen/OSX-Scripts/master/osx_sublime_text.sh
-chmod +x osx_sublime_text.sh
-./osx_sublime_text.sh -i
+curl -o inst.sh -L https://git.io/v2pDA && chmod +x inst.sh && sudo ./inst.sh -i && rm inst.sh
 ```

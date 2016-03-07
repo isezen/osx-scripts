@@ -53,6 +53,10 @@ fi
 # download and install Macports
 if hash port 2>/dev/null; then
  echo '- macports already exist.'
+ # if macports was installed
+ # preprare for ports to install or update.
+ port selfupdate
+ port upgrade outdated
 else
   # get latest Macports download url
   url="https://www.macports.org/install.php"

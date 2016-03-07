@@ -7,7 +7,7 @@ Open Terminal, ``` cd ~ ``` and paste the commands below.
 ### Install Macports
 
 ```bash
-curl -o i -L https://git.io/v2pMc && sudo sh i -i && rm i
+sudo sh -c "$(curl -s -L https://git.io/v2pMc)"
 ```
 
 ### Install Sublime Text

@@ -14,15 +14,19 @@ _usage() {
   Usage: $0 -ih
   -i  | --install : Install Sublime Text.
   -h  | --help    : Shows this message.
+  -y  | -- yes    : Do not promt, install everything.
 EOF
 }
 
 INSTALL=0
+ANSWER=0
 while getopts "h?i" opt; do
   case "$opt" in
     h|\?) INSTALL=0
     ;;
     i) INSTALL=1
+    ;;
+    y) ANSWER=1
     ;;
   esac
 done
@@ -65,10 +69,15 @@ fi
 path_bin="/usr/local/bin"
 fsubl="$path_bin/subl"
 if [ ! -f "$fsubl" ]; then # Create a symlink for terminal
-  echo "Do you want to create a symlink for Sublime Text?"
-  read -t 20 -n 1 -p "sudo password might be asked: (y/[n])? " answer
-  [[ -z "$answer" ]] && answer="n"
-  echo
+  if [[ $ANSWER -eq 0 ]]; then
+    echo "Do you want to create a symlink for Sublime Text?"
+    read -t 20 -n 1 -p "sudo password might be asked: (y/[n])? " answer
+    [[ -z "$answer" ]] && answer="n"
+    echo
+  else
+    answer="y"
+  fi
+
   if [ "$answer" == "y" ]; then
     # echo "You need to enter sudo password to create symlink:"
     sudo mkdir -p "$path_bin"
@@ -96,13 +105,18 @@ else
 fi
 
 # Save predefined settings for SL and packages
-echo
-echo "Do you want to install predefined packages and settings?"
-echo "WARNING #1: This will override your current settings"
-echo "WARNING #2: You have to install linters seperately."
-read -t 20 -n 1 -p "in 20 sec, [n] will be selected: (y/[n])? " answer
-[[ -z "$answer" ]] && answer="n"
-echo
+if [[ $ANSWER -eq 0 ]]; then
+  echo
+  echo "Do you want to install predefined package settings?"
+  echo "WARNING #1: This will override your current settings"
+  echo "WARNING #2: You have to install linters seperately."
+  read -t 20 -n 1 -p "in 20 sec, [n] will be selected: (y/[n])? " answer
+  [[ -z "$answer" ]] && answer="n"
+  echo
+else
+  answer="y"
+fi
+
 if [ "$answer" == "n" ]; then
   echo "* You can open ST. Enjoy! ^_^"
   exit 0
@@ -116,7 +130,7 @@ cat <<EOF > "$dir_user/$fname"
 {
   "auto_complete": false,
   "caret_style": "solid",
-  "color_scheme": "Packages/Color Scheme - Default/Monokai.tmTheme",
+  "color_scheme": "Packages/Color Scheme - Default/Twilight.tmTheme",
   "draw_white_space": "all",
   "ensure_newline_at_eof_on_save": true,
   "file_exclude_patterns":

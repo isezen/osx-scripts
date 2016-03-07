@@ -69,6 +69,8 @@ else
     curl -s -o "$fname" "$url"
   fi
   installer -pkg "$fname" -target /
+  sudo -u $SUDO_USER echo 'export PATH="/opt/local/bin:/opt/local/sbin:$PATH"' >> ~/.profile
+  source ~/.profile
 fi
 
 # Install ports
@@ -79,7 +81,7 @@ tmux
 re2
 geos
 xz
-coreutils +with_default_names
+coreutils
 shellcheck
 wget
 zlib

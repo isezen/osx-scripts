@@ -2,7 +2,7 @@
 
 ## Installation
 
-Open Terminal, ``` cd ~ ``` and paste one of the commands below. Command will be executed. If you want to log output for any case, add ``` 2>&1 | tee -a ~/osx_macports.log```at the end of install command. This will create a file named ```output.log``` in your ```$HOME```directory for futher review.
+Open Terminal, ``` cd ~ ``` and paste one of the commands below. Command will be executed. If you want to log output for any case, add ``` 2>&1 | tee -a ~/out.log```at the end of install command. This will create a file named ```out.log``` in your ```$HOME```directory for futher review.
 
 ### Install Macports
 

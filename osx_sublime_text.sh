@@ -1,15 +1,10 @@
 #!/bin/bash
 #
-# 05-03-2016
+# 2016-03-05
 # Ismail SEZEN sezenismail@gmail.com
 # WARNING: ONLY FOR OSX
 # Usage: ./install_sublime_text.sh -i
 # This script installs latest Sublime Text for mac.
-
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 1
-fi
 
 _usage() {
   cat<<EOF
@@ -35,6 +30,11 @@ shift $((OPTIND-1))
 
 if [[ $INSTALL -eq 0 ]]; then
   _usage
+  exit 0
+fi
+
+if [[ "$OSTYPE" != "darwin"* ]]; then
+  echo "This script is ONLY for MAC OSX."
   exit 0
 fi
 

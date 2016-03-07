@@ -24,7 +24,7 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 
 INSTALL=0
-if [ "$0" != "bash" ]; then
+if [[ ! "$BASH" =~ .*$0.* ]]; then
   while getopts "h?i" opt; do
     case "$opt" in
       h|\?) INSTALL=0

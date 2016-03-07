@@ -55,11 +55,11 @@ else
   if [ ! -f "$fname" ]; then # if zip file does not exist
   	echo "* Downloading: $fname"
     curl -s -o "$fname" "$url"
-    unzip "$fname"
-    dirf="${fname%.*}"
-    cp -r "$dirf/"*ttf "$dir_fonts/"
-    rm -rf "dirf"
-    rm "$fname"
-    echo "* Installed: Ubuntu Fonts"
   fi
+  unzip -qoj "$fname" *ttf -d "$dir_fonts/"
+  rm "$fname"
+    # dirf="${fname%.*}"
+    # cp -r "$dirf/"*ttf "$dir_fonts/"
+    # rm -rf "dirf/"
+  echo "* Installed: Ubuntu Fonts"
 fi

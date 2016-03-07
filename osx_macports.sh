@@ -69,7 +69,8 @@ else
     curl -s -o "$fname" "$url"
   fi
   installer -pkg "$fname" -target /
-  sudo -u $SUDO_USER echo 'export PATH="/opt/local/bin:/opt/local/sbin:$PATH"' >> ~/.profile
+  exp_cmd="export PATH=\"/opt/local/bin:/opt/local/sbin:$PATH\""
+  sudo -u "$SUDO_USER" echo "$exp_cmd"  >> ~/.profile
   source ~/.profile
 fi
 

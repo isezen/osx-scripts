@@ -18,25 +18,29 @@ _usage() {
 EOF
 }
 
-INSTALL=0
-while getopts "h?i" opt; do
-  case "$opt" in
-    h|\?) INSTALL=0
-    ;;
-    i) INSTALL=1
-    ;;
-  esac
-done
-shift $((OPTIND-1))
-
-if [[ $INSTALL -eq 0 ]]; then
-  _usage
-  exit 0
-fi
-
 if [[ "$OSTYPE" != "darwin"* ]]; then
   echo "This script is ONLY for MAC OSX."
   exit 0
+fi
+
+INSTALL=0
+if [ "$0" != "bash" ]; then
+  while getopts "h?i" opt; do
+    case "$opt" in
+      h|\?) INSTALL=0
+      ;;
+      i) INSTALL=1
+      ;;
+    esac
+  done
+  shift $((OPTIND-1))
+
+  if [[ $INSTALL -eq 0 ]]; then
+    _usage
+    exit 0
+  fi
+else
+  INSTALL=1
 fi
 
 if [[ $EUID -ne 0 ]]; then
@@ -57,7 +61,6 @@ if hash port 2>/dev/null; then
  # preprare for ports to install or update.
  port selfupdate
  port upgrade outdated
- port uninstall inactive
 else
   # get latest Macports download url
   url="https://www.macports.org/install.php"
@@ -81,7 +84,8 @@ fi
 
 # Install ports
 
-ports=$(sed -e '/^$/d' -e 's/#.*$//'<<EOF
+ports=$(cat <<EOF
+openmpi-default
 m4
 tmux
 re2
@@ -110,7 +114,6 @@ udunits
 udunits2
 subversion
 zmq
-VLC
 vim
 gnuplot # A command-driven interactive function plotting program
 gsl     # A numerical library for C and C++ programmers
@@ -119,11 +122,11 @@ R
 git     # A fast version control system
 
 python27
+py27-numeric            # Fast and multidimensional array language facility
 py27-re2                # Python wrapper of Google's RE2 library
 py27-pyx                # PyX is a TeX/LaTeX interface for Python
-py27-Pillow
+py27-Pillow             # Python Imaging Library
 py27-polygon            # Python bindings for General Polygon Clipping Library
-py27-pil                # Python Imaging Library
 py27-metar              # python interface to the weather reports of the NOAA
 py27-beautifulsoup
 py27-posixtimezone      # tzinfo implementation for python
@@ -145,7 +148,7 @@ py27-pylint             # Error (and style) checking for python
 py27-dateutil
 py27-nose
 py27-cython
-py27-par                # Parallel Python
+py27-mpi4py +openmpi    # MPI for Python - Python bindings for MPI
 py27-mpi4py             # MPI for Python - Python bindings for MPI
 py27-numpydoc           # Sphinx extension to support docstrings in Numpy
 py27-numpy              # The core utilities for the scientific library scipy
@@ -178,6 +181,7 @@ py27-seaborn            # Statistical data visualization library
 py27-pysparse           # a fast sparse matrix library for Python
 py27-sfepy              # Simple finite elements in python
 py27-backports-lzma
+py27-notebook
 py27-ipython +notebook
 py27-pyside
 py27-fiona
@@ -190,16 +194,17 @@ EOF
 )
 
 while read p; do
-  var=$(port installed "$p")
+  var=$(port installed $p)
   if [[ $var =~ .*None.* ]]; then
-    port install "$p"
+    port install $p
     echo
   else
     echo "INSTALLED ALREADY: $p"
   fi
-done  < <(echo "$ports")
+done < <(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')
 
 # Other settings
+echo
 port select --set python python27
 port select --set python2 python27
 port select --set cython cython27
@@ -219,4 +224,3 @@ port select --set py-sympy py27-sympy
 
 # install linter for R
 # R --slave -e "library(devtools); install_github('jimhester/lintr')"
-

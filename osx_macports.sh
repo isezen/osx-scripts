@@ -57,6 +57,7 @@ if hash port 2>/dev/null; then
  # preprare for ports to install or update.
  port selfupdate
  port upgrade outdated
+ port uninstall inactive
 else
   # get latest Macports download url
   url="https://www.macports.org/install.php"

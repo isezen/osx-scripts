@@ -201,7 +201,7 @@ while read p; do
   else
     echo "INSTALLED ALREADY: $p"
   fi
-done < <(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')
+done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 
 # Other settings
 echo

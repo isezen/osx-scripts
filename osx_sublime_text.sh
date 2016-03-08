@@ -58,6 +58,7 @@ if [ -d  "$dir_app" ]; then
   echo '- Sublime Text already exist.'
 else
   # get latest Sublime text download url
+  # shellcheck disable=SC1003
   url=$(grep -e 'dmg' <(curl -s "https://www.sublimetext.com/3")|
         sed 's/\"https/\'$'\n\"https/g' | sed 's/\"/\"\'$'\n/2'|grep 'https')
   url="${url//\"}" # remove " symbols, curl complains
@@ -473,8 +474,8 @@ cat <<EOF > "$dir_user/$fname"
 #         self.window.run_command('set_layout', {"cols":[0.0, 1.0], "rows":[0.0, 0.5, 1.0], "cells":[[0, 0, 1, 1], [0, 1, 1, 2]]})
 #         self.window.run_command('repl_open',{"type": "subprocess",
 #                                              "encoding": "utf8",
-#                                              "cmd": ["python2.7", "-i", "-u", "$file"],
-#                                              "cwd": "$file_path",
+#                                              "cmd": ["python2.7", "-i", "-u", "\$file"],
+#                                              "cwd": "\$file_path",
 #                                              "syntax": "Packages/Python/Python.tmLanguage",
 #                                              "external_id": "python2.7",
 #                                              "extend_env": {"PYTHONIOENCODING": "utf-8"}

@@ -50,21 +50,21 @@ fi
 
 # Check if XCode was installed
 if [ ! -d "/Applications/Xcode.app" ]; then
-  echo '* Please, install Xcode first.'
-  exit 0
+  echo '* Please, install Xcode first.'; exit 0
 fi
 
 # download and install Macports
 if hash port 2>/dev/null; then
- echo '- macports already exist.'
- # if macports was installed
- # preprare for ports to install or update.
- port selfupdate
- port upgrade outdated
+  echo '- macports already exist.'
+  # if macports was installed
+  # preprare for ports to install or update.
+  port selfupdate
+  port upgrade outdated
 else
   # get latest Macports download url
   url="https://www.macports.org/install.php"
   # shellcheck disable=SC1003
+  # TODO: Add download due to OSX version.
   url=$(grep -e 'ElCapitan.pkg' <(curl -s "$url")|
         sed 's/\"https/\'$'\n\"https/g'|
         sed 's/\"/\"\'$'\n/2'|
@@ -89,35 +89,38 @@ tmux
 re2
 geos
 xz
-coreutils
-shellcheck
+coreutils   # fileutils, shellutils, and textutils
+findutils   # GNU find, xargs, and locate
+diffutils   # GNU diff, diff3, sdiff, and cmp
+renameutils # qmv, qcp, imv, icp and deurlname
+moreutils   # chronic, combine, errno, pee, ...
+shellcheck  # Shell linter
 wget
 zlib
-hdf4
-hdf5 # library and file format for storing scientific data
+hdf5        # library and file format for storing scientific data
 curl
 netcdf
 wgrib2
 aspell
 hunspell
 cairo
-curl
 ffmpeg
 gawk
 gdal
 grep
 gsed
-ImageMagick
-udunits
+getopt
+gnutar
+ImageMagick # Image processing tools
+udunits     # Unit Conversion
 udunits2
-subversion
-zmq
-vim
-gnuplot # A command-driven interactive function plotting program
-gsl     # A numerical library for C and C++ programmers
-texlive
-R
-git     # A fast version control system
+subversion  # Version Control System
+zmq         # Messaging kernel
+gnuplot     # A command-driven interactive function plotting program
+gsl         # A numerical library for C and C++ programmers
+texlive     # LaTeX
+R           # Statistical Language
+git         # A fast version control system
 
 python27
 py27-numeric            # Fast and multidimensional array language facility
@@ -188,6 +191,7 @@ py27-pptx               # Create and update PowerPoint files.
 py27-jupyter
 
 opencv +python27
+vim +python27           # Python Scripting with vim
 EOF
 )
 

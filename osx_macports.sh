@@ -64,6 +64,7 @@ if hash port 2>/dev/null; then
 else
   # get latest Macports download url
   url="https://www.macports.org/install.php"
+  # shellcheck disable=SC1003
   url=$(grep -e 'ElCapitan.pkg' <(curl -s "$url")|
         sed 's/\"https/\'$'\n\"https/g'|
         sed 's/\"/\"\'$'\n/2'|
@@ -191,8 +192,10 @@ EOF
 )
 
 while read p; do
+  # shellcheck disable=SC2086
   var=$(port installed $p)
   if [[ $var =~ .*None.* ]]; then
+    # shellcheck disable=SC2086
     port install $p
     echo
   else

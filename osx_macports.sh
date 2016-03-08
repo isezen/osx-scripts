@@ -77,9 +77,6 @@ else
     curl -s -o "$fname" "$url"
   fi
   installer -pkg "$fname" -target /
-  exp_cmd="export PATH=\"/opt/local/bin:/opt/local/sbin:$PATH\""
-  sudo -u "$SUDO_USER" echo "$exp_cmd"  >> ~/.profile
-  source ~/.profile
 fi
 
 # Install ports
@@ -203,6 +200,30 @@ while read p; do
   fi
 done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 
+# Add export statement into bash_profile
+for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
+  if [ -f "$fl" ]; then
+    # Get right user name
+    [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
+    # Add required path macports to work properly.
+    exp="export PATH=\"/opt/local/bin:/opt/local/sbin:\$PATH\""
+    if ! grep -q "$exp" "$fl"; then
+      note="# MacPorts Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
+      echo -e "\n##\n$note" | sudo -u "$USR" tee -a "$fl" > /dev/null
+      echo "$exp # for macports" | sudo -u "$USR" tee -a "$fl" > /dev/null
+    fi
+
+    # Make GNU tools default.
+    exp="export PATH=\"/opt/local/libexec/gnubin:\$PATH\""
+    if ! grep -q "$exp" "$fl"; then
+      echo -e "$exp # for GNU tools\n" | sudo -u "$USR" tee -a "$fl"
+      > /dev/null
+    fi
+    source "$fl"
+    break
+  fi
+done
+
 # Other settings
 echo
 port select --set python python27
@@ -220,6 +241,7 @@ port select --set memprof py27-memprof
 port select --set mpi mpich-mp-fortran
 port select --set pylint pylint27
 port select --set py-sympy py27-sympy
+port select --set mpi openmpi-mp-fortran
 
 
 # install linter for R

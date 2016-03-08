@@ -3,7 +3,7 @@
 # 2016-03-07
 # Ismaıl SEZEN sezenismail@gmail.com
 # WARNING: ONLY FOR OSX
-# Usage: sudo ./osx_skim.sh -i
+# Usage: ./osx_skim.sh -i
 # This script will download and install Skim PDF reader.
 
 _usage() {
@@ -23,7 +23,7 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 
 INSTALL=0
-if [ "$0" != "bash" ]; then
+if [[ ! "$BASH" =~ .*$0.* ]]; then
   while getopts "h?i" opt; do
     case "$opt" in
       h|\?) INSTALL=0
@@ -51,6 +51,7 @@ else
   url_main="https://sourceforge.net"
   url1="/projects/skim-app/files/Skim/"
   url="$url_main/$url1"
+  # shellcheck disable=SC1003
   url=$(grep -e "$url1" <(curl -s "$url")|
    sed 's/\"\//\'$'\n\"\//g'|
    sed 's/\"/\"\'$'\n/2'|
@@ -70,6 +71,7 @@ else
   hdiutil attach "$fname" > /dev/null
   cp -r /Volumes/Skim/Skim.app /Applications/
   hdiutil detach /Volumes/Skim/ > /dev/null
+  rm "$fname"
   echo "* Installed: Skim.app"
 fi
 

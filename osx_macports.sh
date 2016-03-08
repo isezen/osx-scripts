@@ -124,6 +124,7 @@ R           # Statistical Language
 git         # A fast version control system
 
 python27
+py27-virtualenv         # virtualenv is a tool to create isolated Python
 py27-numeric            # Fast and multidimensional array language facility
 py27-re2                # Python wrapper of Google's RE2 library
 py27-pyx                # PyX is a TeX/LaTeX interface for Python
@@ -138,6 +139,7 @@ py27-rpy2               # A simple and efficient access to R from Python
 py27-pyshp              # Python Shapefile Library
 py27-opengl             # Python binding to OpenGL
 py27-nose               # A Python unittest extension.
+py27-nose-testconfig    # nose-testconfig is a plugin to the nose framework
 py27-liblzma
 py27-jedi
 py27-pip
@@ -215,7 +217,8 @@ for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
     exp="/opt/local/bin:/opt/local/sbin"
     if ! grep -q "$exp" "$fl"; then
       note="# Macports OSX Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
-      printf "\n##\n%s\nexport PATH=\"%s:\$PATH\" # for macports\n" "$note" "$exp" >> "$fl"
+      str="\n##\n%s\nexport PATH=\"%s:\$PATH\" # for macports\n"
+      printf "$str" "$note" "$exp" >> "$fl"
     fi
 
     # Make GNU tools default.
@@ -246,6 +249,8 @@ port select --set mpi mpich-mp-fortran
 port select --set pylint pylint27
 port select --set py-sympy py27-sympy
 port select --set mpi openmpi-mp-fortran
+port select --set virtualenv virtualenv27
+port select --set nosetests nosetests27
 
 
 # install linter for R

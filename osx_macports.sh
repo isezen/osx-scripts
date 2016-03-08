@@ -214,17 +214,17 @@ for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
     # Get right user name
     [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
     # Add required path macports to work properly.
-    exp="export PATH=\"/opt/local/bin:/opt/local/sbin:\$PATH\""
+    exp="export PATH=\"/opt/local/bin:/opt/local/sbin"
     if ! grep -q "$exp" "$fl"; then
       note="# MacPorts Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
       echo -e "\n##\n$note" | sudo -u "$USR" tee -a "$fl" > /dev/null
-      echo "$exp # for macports" | sudo -u "$USR" tee -a "$fl" > /dev/null
+      echo "$exp:\$PATH\" # for macports" | sudo -u "$USR" tee -a "$fl" > /dev/null
     fi
 
     # Make GNU tools default.
-    exp="export PATH=\"/opt/local/libexec/gnubin:\$PATH\""
-    if ! grep -q "$exp" "$fl"; then
-      echo -e "$exp # for GNU tools\n" | sudo -u "$USR" tee -a "$fl" > /dev/null
+    exp="export PATH=\"/opt/local/libexec/gnubin"
+    if grep -q "$exp" "$fl"; then
+      echo -e "$exp:\$PATH\" # for GNU tools\n" | sudo -u "$USR" tee -a "$fl" > /dev/null
     fi
     source "$fl"
     break

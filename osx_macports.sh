@@ -214,20 +214,16 @@ for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
     # Get right user name
     [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
     # Add required path macports to work properly.
-    exp="export PATH=\"/opt/local/bin:/opt/local/sbin"
+    exp="/opt/local/bin:/opt/local/sbin"
     if ! grep -q "$exp" "$fl"; then
-      note="# MacPorts Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
-      echo -e "\n##\n$note" >> "$fl"
-      # | sudo -u "$USR" tee -a "$fl" > /dev/null
-      echo "$exp:\$PATH\" # for macports" >> "$fl"
-      # | sudo -u "$USR" tee -a "$fl" > /dev/null
+      note="# Macports OSX Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
+      printf "\n##\n%s\nexport PATH=\"%s:\$PATH\" # for macports\n" "$note" "$exp" >> "$fl"
     fi
 
     # Make GNU tools default.
-    exp="export PATH=\"/opt/local/libexec/gnubin"
-    if grep -q "$exp" "$fl"; then
-      echo -e "$exp:\$PATH\" # for GNU tools\n" >> "$fl"
-      # | sudo -u "$USR" tee -a "$fl" > /dev/null
+    exp="/opt/local/libexec/gnubin"
+    if ! grep -q "$exp" "$fl"; then
+      printf "export PATH=\"%s:\$PATH\" # for GNU tools\n" "$exp" >> "$fl"
     fi
     source "$fl"
     break

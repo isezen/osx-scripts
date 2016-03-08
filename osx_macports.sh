@@ -217,14 +217,17 @@ for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
     exp="export PATH=\"/opt/local/bin:/opt/local/sbin"
     if ! grep -q "$exp" "$fl"; then
       note="# MacPorts Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
-      echo -e "\n##\n$note" | sudo -u "$USR" tee -a "$fl" > /dev/null
-      echo "$exp:\$PATH\" # for macports" | sudo -u "$USR" tee -a "$fl" > /dev/null
+      echo -e "\n##\n$note" >> "$fl"
+      # | sudo -u "$USR" tee -a "$fl" > /dev/null
+      echo "$exp:\$PATH\" # for macports" >> "$fl"
+      # | sudo -u "$USR" tee -a "$fl" > /dev/null
     fi
 
     # Make GNU tools default.
     exp="export PATH=\"/opt/local/libexec/gnubin"
     if grep -q "$exp" "$fl"; then
-      echo -e "$exp:\$PATH\" # for GNU tools\n" | sudo -u "$USR" tee -a "$fl" > /dev/null
+      echo -e "$exp:\$PATH\" # for GNU tools\n" >> "$fl"
+      # | sudo -u "$USR" tee -a "$fl" > /dev/null
     fi
     source "$fl"
     break

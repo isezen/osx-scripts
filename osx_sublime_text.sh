@@ -54,6 +54,7 @@ fi
 
 # install sublime text
 dir_app="/Applications/Sublime Text.app"
+path_subl="$dir_app/Contents/SharedSupport/bin/subl"
 if [ -d  "$dir_app" ]; then
   echo '- Sublime Text already exist.'
 else
@@ -88,7 +89,7 @@ if [ ! -f "$fsubl" ]; then # Create a symlink for terminal
   if [ "$answer" == "y" ]; then
     # echo "You need to enter sudo password to create symlink:"
     sudo mkdir -p "$path_bin"
-    sudo ln -s "$dir_app/Contents/SharedSupport/bin/subl" "$fsubl"
+    sudo ln -s "$path_subl" "$fsubl"
     echo "* Created Symlink [$fsubl]"
   fi
 else
@@ -127,6 +128,15 @@ fi
 if [ "$answer" == "n" ]; then
   echo "* You can open ST. Enjoy! ^_^"
   exit 0
+fi
+
+# Set Skim.app for LaTeX Tools support
+# this setting helps you use Skim.app for
+# LaTeX writing/editing in Sublime Text.
+if [ -d  /Applications/Skim.app ]; then
+  defaults write -app Skim SKTeXEditorPreset -string ""
+  defaults write -app Skim SKTeXEditorCommand -string "$path_subl"
+  defaults write -app Skim SKTeXEditorArguments -string "\"%file\":%line"
 fi
 
 dir_user="$dir_setting/Packages/User"

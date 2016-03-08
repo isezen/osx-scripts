@@ -203,8 +203,6 @@ while read p; do
     # shellcheck disable=SC2086
     port install $p
     echo
-  else
-    echo "INSTALLED ALREADY: $p"
   fi
 done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 

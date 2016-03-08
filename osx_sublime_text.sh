@@ -20,17 +20,22 @@ EOF
 
 INSTALL=0
 ANSWER=0
-while getopts "h?i" opt; do
-  case "$opt" in
-    h|\?) INSTALL=0
-    ;;
-    i) INSTALL=1
-    ;;
-    y) ANSWER=1
-    ;;
-  esac
-done
-shift $((OPTIND-1))
+if [[ ! "$BASH" =~ .*$0.* ]]; then
+  while getopts "h?i" opt; do
+    case "$opt" in
+      h|\?) INSTALL=0
+      ;;
+      i) INSTALL=1
+      ;;
+      y) ANSWER=1
+      ;;
+    esac
+  done
+  shift $((OPTIND-1))
+else
+  INSTALL=1
+  ANSWER=1
+fi
 
 if [[ $INSTALL -eq 0 ]]; then
   _usage

@@ -94,6 +94,7 @@ findutils   # GNU find, xargs, and locate
 diffutils   # GNU diff, diff3, sdiff, and cmp
 renameutils # qmv, qcp, imv, icp and deurlname
 moreutils   # chronic, combine, errno, pee, ...
+parallel    # Build and execute shell command lines in parallel
 shellcheck  # Shell linter
 wget
 zlib

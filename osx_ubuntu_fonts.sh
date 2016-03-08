@@ -48,6 +48,7 @@ if [ -f  "$dir_fonts/Ubuntu-M.ttf" ]; then
   echo '- Ubuntu Fonts already exist.'
 else
   # get latest Ubuntu Fonts download url
+  # shellcheck disable=SC1003
   url=$(grep -e 'zip' <(curl -s "http://font.ubuntu.com")|
         sed 's/\"\.\./\'$'\n\"\.\./g' | sed 's/\"/\"\'$'\n/2'|grep "\"../")
   url="${url//\"}" # remove " symbols, curl complains
@@ -58,10 +59,7 @@ else
   	echo "* Downloading: $fname"
     curl -s -o "$fname" "$url"
   fi
-  unzip -qoj "$fname" *ttf -d "$dir_fonts/"
+  unzip -qoj "$fname" /*.ttf -d "$dir_fonts/"
   rm "$fname"
-    # dirf="${fname%.*}"
-    # cp -r "$dirf/"*ttf "$dir_fonts/"
-    # rm -rf "dirf/"
   echo "* Installed: Ubuntu Fonts"
 fi

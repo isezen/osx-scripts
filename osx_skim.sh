@@ -1,19 +1,19 @@
 #!/bin/bash
 #
-# 2016-03-07
-# Ismaıl SEZEN sezenismail@gmail.com
-# WARNING: ONLY FOR OSX
-# Usage: ./osx_skim.sh -i
-# This script will download and install Skim PDF reader.
-
 _usage() {
   cat<<EOF
-  Skim PDF App OSX Installer Script 2016 Ismail SEZEN
-    Installs latest Macports for Mac OSX and
-    predefined ports.
-  Usage: sudo $0 -ih
-  -i  | --install : Install Skim App.
+  Skim PDF OSX Installer Script v16.03.08
+  Ismail SEZEN sezenismail@gmail.com 2016
+  WARNING: ONLY FOR OSX
+  USAGE:
+    $ sudo $0 -ih
+  OR
+    $ sudo sh -c "$(curl -s -L https://git.io/vaJg2)"
+  ARGUMENTS:
+  -i  | --install : Install Skim PDF
   -h  | --help    : Shows this message.
+  DESCRIPTION:
+  This script will download and install latest Skim.app
 EOF
 }
 

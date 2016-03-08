@@ -1,20 +1,20 @@
 #!/bin/bash
 #
-# 2016-03-06
-# Ismaıl SEZEN sezenismail@gmail.com
-# WARNING: ONLY FOR OSX
-# Usage: sudo ./osx_macports.sh -i
-# This script will download and install macports and all required ports.
-# see ports.txt and ports_settings.txt files what will be installed.
-
 _usage() {
   cat<<EOF
-  Macports OSX Installer Script 2016 Ismail SEZEN
-    Installs latest Macports for Mac OSX and
-    predefined ports.
-  Usage: sudo $0 -ih
+  Macports OSX Installer Script v16.03.08
+  Ismail SEZEN sezenismail@gmail.com 2016
+  WARNING: ONLY FOR OSX
+  USAGE:
+    $ sudo $0 -ih
+  OR
+    $ sudo sh -c "$(curl -s -L https://git.io/v2pMc)"
+  ARGUMENTS:
   -i  | --install : Install Macports
   -h  | --help    : Shows this message.
+  DESCRIPTION:
+  This script will download and install latest
+  macports and all predefined ports and settings.
 EOF
 }
 

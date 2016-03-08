@@ -1,18 +1,20 @@
 #!/bin/bash
 #
-# 2016-03-07
-# Ismail SEZEN sezenismail@gmail.com
-# WARNING: ONLY FOR OSX
-# Usage: ./install_ubuntu_fonts.sh -i
-# This script installs latest Ubuntu Font Family for mac.
-
 _usage() {
   cat<<EOF
-  Ubuntu Fonts OSX Installer Script 2016 Ismail SEZEN
-    Installs latest Ubuntu Fonts for Mac OSX
-  Usage: $0 -ih
+  Ubuntu Fonts OSX Installer Script v16.03.08
+  Ismail SEZEN sezenismail@gmail.com 2016
+  WARNING: ONLY FOR OSX
+  USAGE:
+    $ sudo $0 -ih
+  OR
+    $ sudo sh -c "$(curl -s -L https://git.io/vaJoi)"
+  ARGUMENTS:
   -i  | --install : Install Ubuntu Fonts
   -h  | --help    : Shows this message.
+  DESCRIPTION:
+  This script will download and install latest
+  Ubuntu Fonts Family.
 EOF
 }
 

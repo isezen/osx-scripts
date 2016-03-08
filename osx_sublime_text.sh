@@ -1,22 +1,21 @@
 #!/bin/bash
 #
-# 2016-03-05
-# Ismail SEZEN sezenismail@gmail.com
-# WARNING: ONLY FOR OSX
-# Usage: ./install_sublime_text.sh -i
-# This script installs latest Sublime Text for mac and
-# might promt for your sudo password.
-
 _usage() {
   cat<<EOF
-  Sublime Text OSX Installer Script 2016 Ismail SEZEN
-    Installs latest Sublime Text for Mac OSX,
-    predefined packages and settings. You might
-    need to enter your sudo password.
-  Usage: $0 -ih
-  -i  | --install : Install Sublime Text.
-  -h  | --help    : Shows this message.
+  Sublime Text OSX Installer Script v16.03.08
+  Ismail SEZEN sezenismail@gmail.com 2016
+  WARNING: ONLY FOR OSX
+  USAGE:
+    $ sudo $0 -ih
+  OR
+    $ sudo sh -c "$(curl -s -L https://git.io/v2pDA)"
+  ARGUMENTS:
+  -i  | --install : Install Sublime Text
   -y  | -- yes    : Do not promt, install everything.
+  -h  | --help    : Shows this message.
+  DESCRIPTION:
+  This script will download and install latest
+  Sublime Text and whole predefined plugins and settings.
 EOF
 }
 

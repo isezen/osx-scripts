@@ -224,8 +224,7 @@ for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
     # Make GNU tools default.
     exp="export PATH=\"/opt/local/libexec/gnubin:\$PATH\""
     if ! grep -q "$exp" "$fl"; then
-      echo -e "$exp # for GNU tools\n" |
-               sudo -u "$USR" tee -a "$fl" > /dev/null
+      echo -e "$exp # for GNU tools\n" | sudo -u "$USR" tee -a "$fl" > /dev/null
     fi
     source "$fl"
     break

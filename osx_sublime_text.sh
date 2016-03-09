@@ -8,7 +8,7 @@ _usage() {
   USAGE:
     $ sudo $0 -ih
   OR
-    $ sudo sh -c "$(curl -s -L https://git.io/v2pDA)"
+    $ sudo sh -c "\$(curl -sL https://git.io/v2pDA)"
   ARGUMENTS:
   -i  | --install : Install Sublime Text
   -y  | -- yes    : Do not promt, install everything.

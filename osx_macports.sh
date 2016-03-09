@@ -8,7 +8,7 @@ _usage() {
   USAGE:
     $ sudo $0 -ih
   OR
-    $ sudo sh -c "$(curl -s -L https://git.io/v2pMc)"
+    $ sudo sh -c "\$(curl -sL https://git.io/v2pMc)"
   ARGUMENTS:
   -i  | --install : Install Macports
   -h  | --help    : Shows this message.

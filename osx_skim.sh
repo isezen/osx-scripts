@@ -8,7 +8,7 @@ _usage() {
   USAGE:
     $ sudo $0 -ih
   OR
-    $ sudo sh -c "$(curl -s -L https://git.io/vaJg2)"
+    $ sudo sh -c "\$(curl -sL https://git.io/vaJg2)"
   ARGUMENTS:
   -i  | --install : Install Skim PDF
   -h  | --help    : Shows this message.

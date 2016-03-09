@@ -8,7 +8,7 @@ _usage() {
   USAGE:
     $ sudo $0 -ih
   OR
-    $ sudo sh -c "$(curl -s -L https://git.io/vaJoi)"
+    $ sudo sh -c "\$(curl -sL https://git.io/vaJoi)"
   ARGUMENTS:
   -i  | --install : Install Ubuntu Fonts
   -h  | --help    : Shows this message.

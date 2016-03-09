@@ -6,15 +6,16 @@ _usage() {
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ $0 -ih
+   $ $0 -ih
   OR
-    $ sh -c "$(curl -sL )"
+   $ sh -c "\$(curl -sL https://git.io/vaT0V)"
   ARGUMENTS:
   -i  | --install : Install iTerm2
   -h  | --help    : Shows this message.
   DESCRIPTION:
   This script will download and install latest (even Beta)
   iTerm2 and whole predefined settings.
+
 EOF
 }
 
@@ -63,7 +64,7 @@ else
   	echo "* Downloading: $fname"
     curl -s -o "$fname" "$url"
   fi
-  unzip -qo "$fname" -d "/Applications/"
+  unzip -qo "$fname" -d /Applications
   rm "$fname"
   echo "* Installed: iTerm2"
 fi

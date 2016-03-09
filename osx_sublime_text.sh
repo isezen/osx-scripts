@@ -1,14 +1,15 @@
 #!/bin/bash
+# sh -c "$(curl -sL https://git.io/v2pDA)"
 #
 _usage() {
   cat<<EOF
-  Sublime Text OSX Installer Script v16.03.08
+  Sublime Text OSX Installer Script v16.03.09
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -ih
+    $ $0 -ih
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/v2pDA)"
+    $ sh -c "\$(curl -sL https://git.io/v2pDA)"
   ARGUMENTS:
   -i  | --install : Install Sublime Text
   -y  | -- yes    : Do not promt, install everything.

@@ -1,14 +1,15 @@
 #!/bin/bash
+# sh -c "$(curl -sL https://git.io/vaTdJ)"
 #
 _usage() {
   cat<<EOF
-  RStudio OSX Installer Script v16.03.08
+  RStudio OSX Installer Script v16.03.09
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -ih
+    $ $0 -ih
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/vaTdJ)"
+    $ sh -c "\$(curl -sL https://git.io/vaTdJ)"
   ARGUMENTS:
   -i  | --install : Install RStudio
   -h  | --help    : Shows this message.
@@ -41,11 +42,6 @@ if [[ ! "$BASH" =~ .*$0.* ]]; then
   fi
 else
   INSTALL=1
-fi
-
-if [[ $EUID -ne 0 ]]; then
-  echo "Run with sudo."
-  exit 1
 fi
 
 # Check if R was installed

@@ -1,14 +1,15 @@
 #!/bin/bash
+# sh -c "$(curl -sL https://git.io/vaJoi)"
 #
 _usage() {
   cat<<EOF
-  Ubuntu Fonts OSX Installer Script v16.03.08
+  Ubuntu Fonts OSX Installer Script v16.03.09
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -ih
+    $ $0 -ih
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/vaJoi)"
+    $ sh -c "\$(curl -sL https://git.io/vaJoi)"
   ARGUMENTS:
   -i  | --install : Install Ubuntu Fonts
   -h  | --help    : Shows this message.

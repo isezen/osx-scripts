@@ -1,14 +1,15 @@
 #!/bin/bash
+# sh -c "$(curl -sL https://git.io/vaJg2)"
 #
 _usage() {
   cat<<EOF
-  Skim PDF OSX Installer Script v16.03.08
+  Skim PDF OSX Installer Script v16.03.09
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -ih
+    $ $0 -ih
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/vaJg2)"
+    $ sh -c "\$(curl -sL https://git.io/vaJg2)"
   ARGUMENTS:
   -i  | --install : Install Skim PDF
   -h  | --help    : Shows this message.

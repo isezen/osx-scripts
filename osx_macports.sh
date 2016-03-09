@@ -1,8 +1,9 @@
 #!/bin/bash
+# sh -c "$(curl -sL https://git.io/v2pMc)"
 #
 _usage() {
   cat<<EOF
-  Macports OSX Installer Script v16.03.08
+  Macports OSX Installer Script v16.03.09
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:

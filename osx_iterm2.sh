@@ -1,8 +1,9 @@
 #!/bin/bash
+# sh -c "$(curl -sL https://git.io/vaT0V)"
 #
 _usage() {
   cat<<EOF
-  iTerm2 OSX Installer Script v16.03.08
+  iTerm2 OSX Installer Script v16.03.09
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:

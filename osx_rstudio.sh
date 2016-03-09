@@ -8,7 +8,7 @@ _usage() {
   USAGE:
     $ sudo $0 -ih
   OR
-    $ sudo sh -c "\$(curl -sL #TODO)"
+    $ sudo sh -c "\$(curl -sL https://git.io/vaTdJ)"
   ARGUMENTS:
   -i  | --install : Install RStudio
   -h  | --help    : Shows this message.

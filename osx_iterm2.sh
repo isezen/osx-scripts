@@ -61,7 +61,7 @@ else
   fname=${url##*/} # get filename
   url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
   if [ ! -f "$fname" ]; then # if zip file does not exist
-  	echo "* Downloading: $fname"
+    echo "* Downloading: $fname"
     curl -s -o "$fname" "$url"
   fi
   unzip -qo "$fname" -d /Applications

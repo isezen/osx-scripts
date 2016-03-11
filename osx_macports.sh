@@ -82,8 +82,9 @@ else
 fi
 
 # Install ports
-
 ports=$(cat <<EOF
+glpk        # required for R package: Rglpk
+libiconv    # Required for R package: git2r
 openmpi-default
 m4
 tmux
@@ -122,7 +123,8 @@ gnuplot     # A command-driven interactive function plotting program
 gsl         # A numerical library for C and C++ programmers
 texlive     # LaTeX
 R           # Statistical Language
-git         # A fast version control system
+git         # A fast version control
+filezilla   # FTP, FTPS and SFTP Client
 
 python27
 py27-virtualenv         # virtualenv is a tool to create isolated Python
@@ -212,13 +214,12 @@ done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 # Add export statement into bash_profile
 for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
   if [ -f "$fl" ]; then
-    # Get right user name
-    [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
     # Add required path macports to work properly.
     exp="/opt/local/bin:/opt/local/sbin"
     if ! grep -q "$exp" "$fl"; then
       note="# Macports OSX Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
       str="\n##\n%s\nexport PATH=\"%s:\$PATH\" # for macports\n"
+      # shellcheck disable=SC2059
       printf "$str" "$note" "$exp" >> "$fl"
     fi
 
@@ -253,6 +254,3 @@ port select --set mpi openmpi-mp-fortran
 port select --set virtualenv virtualenv27
 port select --set nosetests nosetests27
 
-
-# install linter for R
-# R --slave -e "library(devtools); install_github('jimhester/lintr')"

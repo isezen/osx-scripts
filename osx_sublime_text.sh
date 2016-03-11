@@ -3,7 +3,7 @@
 #
 _usage() {
   cat<<EOF
-  Sublime Text OSX Installer Script v16.03.09
+  Sublime Text OSX Installer Script v16.03.11
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
@@ -23,7 +23,7 @@ EOF
 INSTALL=0
 ANSWER=0
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?iy" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;

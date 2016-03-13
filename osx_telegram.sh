@@ -3,7 +3,7 @@
 #
 _usage() {
   cat<<EOF
-  Telegram OSX Installer Script v16.03.09
+  Telegram OSX Installer Script v16.03.13
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
@@ -11,8 +11,8 @@ _usage() {
   OR
    $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
-  -i  | --install : Install Telegram
-  -h  | --help    : Shows this message.
+  -i | --install : Install Telegram
+  -h | --help    : Shows this message.
   DESCRIPTION:
   This script will download and install latest Telegram.
 
@@ -20,11 +20,10 @@ EOF
 }
 
 function getUriFilename() {
-  crl=/usr/bin/curl
-  echo $($crl -sI "$1"|
-           tr -d '\r'|
-           grep -o -E 'Location:.*$'|
-           sed 's/Location: //g')
+  curl -sI "$1"|
+    tr -d '\r'|
+    grep -o -E 'Location:.*$'|
+    sed 's/Location: //g'
 }
 
 INSTALL=0
@@ -53,6 +52,7 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 
 dir_app="/Applications/Telegram.app"
+# shellcheck disable=SC1003
 ver=$(curl -s "https://desktop.telegram.org"|
       grep -e 'og:description'|
       sed 's/content=\"v /\'$'\n/g'|
@@ -67,7 +67,6 @@ if [ -d "$dir_app" ]; then
 fi
 
 # Install Telegram
-crl=/usr/bin/curl
 url="https://tdesktop.com/mac"
 url=$(getUriFilename "$(getUriFilename $url)")
 url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
@@ -75,7 +74,7 @@ fname=${url##*/} # get filename
 fname_tmp="/tmp/$fname"
 if [ ! -f "$fname_tmp" ]; then # if dmg file does not exist
   echo "* Downloading: $fname"
-  curl -s -o "$fname_tmp" "$url"
+  curl -o "$fname_tmp" "$url"
 fi
 hdiutil attach "$fname_tmp" > /dev/null
 cp -r /Volumes/Telegram\ Desktop/Telegram.app /Applications/

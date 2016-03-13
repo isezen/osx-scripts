@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaLDq)"
+# sh -c "$(curl -sL https://git.io/vaCty)"
 #
 _usage() {
   cat<<EOF
@@ -9,7 +9,7 @@ _usage() {
   USAGE:
     $ sudo $0 -ih
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/vaLDq)"
+    $ sudo sh -c "\$(curl -sL https://git.io/vaCty)"
   ARGUMENTS:
   -i  | --install : Install R Packages
   -h  | --help    : Shows this message.

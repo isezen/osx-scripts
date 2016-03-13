@@ -45,7 +45,7 @@ else
 fi
 
 # Check if R was installed
-if hash R 2>/dev/null; then
+if ! hash R 2>/dev/null; then
   echo '* Please, install R first.'; exit 0
 fi
 

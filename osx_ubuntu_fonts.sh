@@ -20,6 +20,7 @@ EOF
 }
 
 INSTALL=0
+if [[ ! "$BASH" =~ .*$0.* ]]; then
 while getopts "h?i" opt; do
   case "$opt" in
     h|\?) INSTALL=0
@@ -29,10 +30,12 @@ while getopts "h?i" opt; do
   esac
 done
 shift $((OPTIND-1))
-
-if [[ $INSTALL -eq 0 ]]; then
-  _usage
-  exit 0
+  if [[ $INSTALL -eq 0 ]]; then
+    _usage
+    exit 0
+  fi
+else
+  INSTALL=1
 fi
 
 if [[ "$OSTYPE" != "darwin"* ]]; then

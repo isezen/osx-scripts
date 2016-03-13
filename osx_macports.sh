@@ -85,6 +85,7 @@ fi
 
 # Install ports
 ports=$(cat <<EOF
+xorg-server # required for R package: rgl
 glpk        # required for R package: Rglpk
 libiconv    # Required for R package: git2r
 openmpi-default

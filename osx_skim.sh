@@ -53,10 +53,11 @@ else
   url1="/projects/skim-app/files/Skim/"
   url="$url_main/$url1"
   # shellcheck disable=SC1003
-  url=$(grep -e "$url1" <(curl -s "$url")|
-   sed 's/\"\//\'$'\n\"\//g'|
-   sed 's/\"/\"\'$'\n/2'|
-   grep '\"\/projects'|head -1)
+  url=$(curl -s "$url"|
+        grep -e "$url1"|
+        sed 's/\"\//\'$'\n\"\//g'|
+        sed 's/\"/\"\'$'\n/2'|
+        grep '\"\/projects'|head -1)
 
   url="${url//\"}" # remove " symbols, curl complains
   url="${url%?}"
@@ -64,15 +65,16 @@ else
   url="$url_main$url/$fname.dmg/download"
   url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
   fname="$fname.dmg"
-  if [ ! -f "$fname" ]; then # if dmg file does not exist
+  fname_tmp="/tmp/$fname"
+  if [ ! -f "$fname_tmp" ]; then # if dmg file does not exist
     echo "* Downloading: $fname"
-    curl -sL -o "$fname" "$url"
+    curl -oL "$fname_tmp" "$url"
   fi
 
-  hdiutil attach "$fname" > /dev/null
+  hdiutil attach "$fname_tmp" > /dev/null
   cp -r /Volumes/Skim/Skim.app /Applications/
   hdiutil detach /Volumes/Skim/ > /dev/null
-  rm "$fname"
+  rm "$fname_tmp"
   echo "* Installed: Skim.app"
 fi
 

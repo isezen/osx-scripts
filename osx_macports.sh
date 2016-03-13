@@ -58,7 +58,7 @@ fi
 if hash port 2>/dev/null; then
   echo '- macports already exist.'
   # if macports was installed
-  # preprare for ports to install or update.
+  # prepare ports to install or update.
   port selfupdate
   port upgrade outdated
 else
@@ -66,19 +66,21 @@ else
   url="https://www.macports.org/install.php"
   # shellcheck disable=SC1003
   # TODO: Add download due to OSX version.
-  url=$(grep -e 'ElCapitan.pkg' <(curl -s "$url")|
+  url=$(curl -s "$url"|
+        grep -e 'ElCapitan.pkg'|
         sed 's/\"https/\'$'\n\"https/g'|
         sed 's/\"/\"\'$'\n/2'|
         grep 'https'|
         uniq)
   url="${url//\"}" # remove " symbols, curl complains
   fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
   url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-  if [ ! -f "$fname" ]; then # if pkg file does not exist
+  if [ ! -f "$fname_tmp" ]; then # if pkg file does not exist
     echo "* Downloading: $fname"
-    curl -s -o "$fname" "$url"
+    curl -s -o "$fname_tmp" "$url"
   fi
-  installer -pkg "$fname" -target /
+  installer -pkg "$fname_tmp" -target /
 fi
 
 # Install ports

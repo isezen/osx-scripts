@@ -11,8 +11,9 @@ _usage() {
   OR
     $ sudo sh -c "\$(curl -sL https://git.io/vaCty)"
   ARGUMENTS:
-  -i  | --install : Install R Packages
-  -h  | --help    : Shows this message.
+  -i | --install : Install R Packages
+  -a | --all     : for All users
+  -h | --help    : Shows this message.
   DESCRIPTION:
   This script will install predefined R packages.
 EOF
@@ -24,12 +25,15 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 
 INSTALL=0
+ALL=0
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?ia" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
       i) INSTALL=1
+      ;;
+      a) ALL=1
       ;;
     esac
   done
@@ -41,6 +45,7 @@ if [[ ! "$BASH" =~ .*$0.* ]]; then
   fi
 else
   INSTALL=1
+  ALL=1
 fi
 
 if [[ $EUID -ne 0 ]]; then
@@ -51,11 +56,12 @@ fi
 # Check if XCode was installed
 r_exist=0
 for fl in /usr/bin/R /opt/local/bin/R; do
-  if hash $fl 2>/dev/null; then
+  if [ -f  $fl ]; then
     r_exist=1
     break
   fi
 done
+
 if [[ $r_exist -eq 0 ]]; then
   echo "Please, install R."
 fi
@@ -384,30 +390,51 @@ echo "* Installing R packages"
 # shellcheck disable=SC2001
 pkgs=$(echo "$rpkgs" | sed -e 's/#.*$//')
 pkgs=$(echo "$pkgs" | uniq) # remove duplicate entries and sort
-lnum=$(echo "$pkgs" | wc -l) # Number of lines
-echo "* $lnum packages will be installed."
 pkgs="$(echo "$pkgs"|
         sed -e '/^$/d'|
         sed 's/[ \t]*$//'|
         tr '\n' " "|
         sed "s/[^ ][^ ]*/\"&\",/g")"
 pkgs="${pkgs%??}" # remove last two chars
-echo "$fl"
 
-$fl --slave -e "\
-ip <- function(p){\
-  np <- p[!(p %in% installed.packages()[, \"Package\"])];\
-  print(np);\
-  if (length(np)) install.packages(np, Ncpus=2,\
-                                   dependencies = TRUE,\
-                                   repos=\"https://cran.rstudio.com/\")}; \
-test <- function(p){\
-  x <- require(p);\
-  detach(paste0(\"package:\",p, unload=TRUE));\
-  invisible(x)};\
-pkgs <- c($pkgs);\
-ip(pkgs);\
-sapply(pkgs, test, character.only = TRUE);"
+Rscript -<<EOF
+ip <- function(p){
+  np <- p[!(p %in% installed.packages()[, "Package"])]
+  if (length(np)){
+    cat("Following", length(np), "packages will be installed:\n")
+    cat(np, "\n\n")
+    for_all_users <- $ALL
+    lib <- .libPaths()[1]
+    if(for_all_users == 1) lib <- .Library
+    install.packages(np, lib=lib, dependencies = TRUE,
+                     Ncpus=2, repos="https://cran.rstudio.com/")
+  }
+}
+test <- function(p){
+  suppressWarnings(suppressMessages(x <- require(p, character.only = TRUE)))
+  p2 <- paste0("package:",p)
+  if(x) suppressWarnings(suppressMessages(detach(p2, unload=TRUE,
+                                          character.only = TRUE)))
+  invisible(x)
+}
+invisible(pkgs <- c($pkgs))
+ip(pkgs)
+res<-sapply(pkgs, test)
+if(all(res!=T)){
+  failed <- res[res==F]
+  n_failed <- length(failed)
+  failed <- paste(names(failed), collapse='","')
+  cat("The following",n_failed ,"packages can not be installed:\n")
+  cat(paste0('c("', failed, '")\n\n'))
+}else{
+  print("All packages installed successfully")
+}
+EOF
 
-
-
+# Base packages
+#  [1] "KernSmooth" "MASS"       "Matrix"     "base"       "boot"
+#  [6] "class"      "cluster"    "codetools"  "compiler"   "datasets"
+# [11] "foreign"    "grDevices"  "graphics"   "grid"       "lattice"
+# [16] "methods"    "mgcv"       "nlme"       "nnet"       "parallel"
+# [21] "rpart"      "spatial"    "splines"    "stats"      "stats4"
+# [26] "survival"   "tcltk"      "tools"      "utils"

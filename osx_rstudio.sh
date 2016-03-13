@@ -50,7 +50,7 @@ if ! hash R 2>/dev/null; then
 fi
 
 # download and install RStudio
-if [ ! -d "/Applications/RStudio.app" ]; then
+if [ -d "/Applications/RStudio.app" ]; then
   echo '- RStudio already exist.'
 else
   # get latest RStudio download url

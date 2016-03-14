@@ -89,7 +89,8 @@ libGLU
 xorg-server-devel # required for R package: rgl
 glpk              # required for R package: Rglpk
 libiconv          # Required for R package: git2r
-openmpi-default
+openmpi
+mpich
 m4
 tmux
 re2

@@ -3,7 +3,7 @@
 #
 _usage() {
   cat<<EOF
-  RStudio OSX Installer Script v16.03.09
+  RStudio OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
@@ -73,6 +73,8 @@ else
   echo "* Installed: RStudio"
 fi
 
+# for LC_CTYPE failed error
+defaults write org.R-project.R force.LANG en_US.UTF-8
 
 # install linter for R
 # R --slave -e "library(devtools); install_github('jimhester/lintr')"

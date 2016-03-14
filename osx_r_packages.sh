@@ -430,6 +430,7 @@ ip(pkgs)
 EOF
 
 # for gsl package
+# http://stackoverflow.com/questions/24781125/installing-r-gsl-package-on-mac
 # gsl-config --libs
 # gsl-config --cflags
 # sudo CFLAGS="-I/opt/local/include" LDFLAGS="-L/opt/local/lib -lgsl -lgslcblas" R

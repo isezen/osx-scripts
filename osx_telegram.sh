@@ -5,7 +5,7 @@ APPNAME="Telegram"
 INSTALL=0
 DIR_APP="/Applications/$APPNAME.app"
 
-_usage() {
+function _usage() {
   cat<<EOF
   $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
@@ -24,14 +24,12 @@ _usage() {
 EOF
 }
 
-
 function _getUriFilename() {
   curl -sI "$1"|
     tr -d '\r'|
     grep -o -E 'Location:.*$'|
     sed 's/Location: //g'
 }
-
 
 function _ver_check() {
   ver=$(curl -s "https://desktop.telegram.org"|
@@ -42,18 +40,41 @@ function _ver_check() {
     # shellcheck disable=SC2086
     cur_ver=$(defaults read $read_str)
     if [[ "$ver" == "$cur_ver" ]]; then
-      MSG="- $APPNAME already exist and up-to-date"
+      MSG="- Latest version is installed"
       return 0
     else
-      echo "* A new $APPNAME is available : v$ver"
-      MSG="* Updated : $APPNAME (ver: $ver)"
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$ver)"
+      MSG="* Updated : $APPNAME to version v$ver"
       return 2
     fi
   else
-    MSG="* Installed : $APPNAME (ver: $ver)"
-    return 1
+    MSG="* Installed : $APPNAME v$ver"
   fi
   return 1
+}
+
+# $1 : url
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ]; then
+    curl -# -o "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+# $1 : file path to attach
+# $2 : Path to Volume
+# $3 : Path to install dir
+function _setup() {
+  idir=$3
+  if [ -z "${3+x}" ]; then idir="/Applications/"; fi
+  DIR=$(dirname "${2}")
+  hdiutil attach "$1" > /dev/null
+  cp -r "/Volumes$2" $idir
+  hdiutil detach "/Volumes$DIR/" > /dev/null
 }
 
 # Install Telegram
@@ -65,16 +86,8 @@ function _install() {
   url=${url//[0-9]\.[0-9]\.[0-9][0-9]/$ver}
   # replace space by %20
   url=$( printf "%s\n" "$url" | sed 's/ /%20/g')
-  fname=${url##*/} # get filename
-  fname_tmp="/tmp/$fname"
-  # if dmg file does not exist
-  if [ ! -f "$fname_tmp" ]; then
-    echo "* Downloading: $fname"
-    curl -o "$fname_tmp" "$url"
-  fi
-  hdiutil attach "$fname_tmp" > /dev/null
-  cp -r /Volumes/Telegram\ Desktop/Telegram.app /Applications/
-  hdiutil detach /Volumes/Telegram\ Desktop/ > /dev/null
+  fname_tmp=$(_download "$url")
+  _setup "$fname_tmp" "/Telegram Desktop/Telegram.app"
 }
 
 if [[ ! "$BASH" =~ .*$0.* ]]; then
@@ -91,8 +104,7 @@ else
   INSTALL=1
 fi
 
-if [[ $INSTALL -eq 0 ]]; then _usage
-else
+if [[ $INSTALL -eq 0 ]]; then _usage; else
   if [[ "$OSTYPE" != "darwin"* ]]; then
     echo "This script is ONLY for MAC OSX."
   else

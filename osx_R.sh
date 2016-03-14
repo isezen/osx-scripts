@@ -31,7 +31,7 @@ fi
 INSTALL=0
 MP=0
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?im" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
@@ -65,7 +65,7 @@ if [[ $MP -eq 0 ]]; then
   # Check installed R version if exist
   ver=
   # shellcheck disable=SC1003
-  if hash /usr/bin/R 2>/dev/null; then
+  if [ -f /usr/bin/R ]; then
     ver=$(/usr/bin/R --version |
           grep -e '[0-9]\.[0-9]\.[0-9]'|
           sed 's/version /\'$'\n1a2wc=/g'|
@@ -73,7 +73,6 @@ if [[ $MP -eq 0 ]]; then
           grep '1a2wc='|
           sed 's/1a2wc=//g')
   fi
-
   # get latest R download url
   urlp="https://cran.r-project.org/bin/macosx/"
   # shellcheck disable=SC1003

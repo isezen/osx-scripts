@@ -295,7 +295,6 @@ RcppEigen       # R and 'Eigen' integration using 'Rcpp'
 Rcsdp
 RCurl           # A wrapper for 'libcurl'
 readr
-regions         # Interface to Geometry Engine - Open Source (GEOS) using the C API for topology
 registry        # Provides a generic infrastructure for creating and using registries
 reporttools     # Helpful when writing reports of data analysis using Sweave
 reshape         # Restructure and aggregate data using melt and cast
@@ -320,7 +319,6 @@ robustbase      # "Essential" Robust Statistics
 roxygen2        # A 'Doxygen'-like in-source documentation system
 rpf
 rrcov           # Robust Location and Scatter Estimation
-rstudio         # Interactive Plots for RStudio
 rstudioapi      # Access the RStudio API (if available) and provide informative error
 RUnit           # R functions implementing a standard Unit Testing
 Rvcg            # Operations on triangular meshes based on 'VCGLIB'
@@ -385,14 +383,13 @@ zoo             # An S3 class with methods for totally ordered indexed
 EOF
 )
 
-echo "* Installing R packages"
 # remove comment lines
 # shellcheck disable=SC2001
 pkgs=$(echo "$rpkgs" | sed -e 's/#.*$//')
 pkgs=$(echo "$pkgs" | uniq) # remove duplicate entries and sort
 pkgs="$(echo "$pkgs"|
         sed -e '/^$/d'|
-        sed 's/[ \t]*$//'|
+        sed -e 's/  *$//'|
         tr '\n' " "|
         sed "s/[^ ][^ ]*/\"&\",/g")"
 pkgs="${pkgs%??}" # remove last two chars
@@ -400,36 +397,44 @@ pkgs="${pkgs%??}" # remove last two chars
 Rscript -<<EOF
 ip <- function(p){
   np <- p[!(p %in% installed.packages()[, "Package"])]
-  if (length(np)){
-    cat("Following", length(np), "packages will be installed:\n")
+  lnp <- length(np)
+  lib <- .libPaths()[1]
+  if($ALL) lib <- .Library
+  if (lnp){
+    cat("Following", lnp, "packages will be installed:\n")
     cat(np, "\n\n")
-    for_all_users <- $ALL
-    lib <- .libPaths()[1]
-    if(for_all_users == 1) lib <- .Library
-    install.packages(np, lib=lib, dependencies = TRUE,
+    install.packages(np, lib=lib, dependencies = TRUE, quiet=F,
                      Ncpus=2, repos="https://cran.rstudio.com/")
+    failed <- np[!(np %in% installed.packages()[, "Package"])]
+    n_failed <- length(failed)
+    if(n_failed){
+      failed <- paste(failed, collapse='","')
+      cat("The following",n_failed ,"packages can not be installed:\n")
+      cat(paste0('c("', failed, '")\n\n'))
+    }else{
+      cat("* All packages installed successfully\n")
+    }
+  }else{
+    op <- old.packages(lib.loc=lib, repos="https://cran.rstudio.com/")
+    if(!is.null(op)){
+      cat("* Following pacakges will be updated:\n")
+      print(op[,c(1,3,5)])
+      update.packages(lib.loc=lib, repos="https://cran.rstudio.com/", ask=F)
+    }else{
+      cat("- All predefined packages have alredy been installed and up-to-date.\n")
+    }
   }
-}
-test <- function(p){
-  suppressWarnings(suppressMessages(x <- require(p, character.only = TRUE)))
-  p2 <- paste0("package:",p)
-  if(x) suppressWarnings(suppressMessages(detach(p2, unload=TRUE,
-                                          character.only = TRUE)))
-  invisible(x)
 }
 invisible(pkgs <- c($pkgs))
 ip(pkgs)
-res<-sapply(pkgs, test)
-if(all(res!=T)){
-  failed <- res[res==F]
-  n_failed <- length(failed)
-  failed <- paste(names(failed), collapse='","')
-  cat("The following",n_failed ,"packages can not be installed:\n")
-  cat(paste0('c("', failed, '")\n\n'))
-}else{
-  print("All packages installed successfully")
-}
 EOF
+
+# for gsl package
+# gsl-config --libs
+# gsl-config --cflags
+# sudo CFLAGS="-I/opt/local/include" LDFLAGS="-L/opt/local/lib -lgsl -lgslcblas" R
+
+# for rgl to work, you have to install XQuartz. http://www.xquartz.org
 
 # Base packages
 #  [1] "KernSmooth" "MASS"       "Matrix"     "base"       "boot"
@@ -438,3 +443,8 @@ EOF
 # [16] "methods"    "mgcv"       "nlme"       "nnet"       "parallel"
 # [21] "rpart"      "spatial"    "splines"    "stats"      "stats4"
 # [26] "survival"   "tcltk"      "tools"      "utils"
+
+# Warning: dependencies ‘GenomicRanges’, ‘BiocInstaller’, ‘marray’, ‘affy’, ‘Biobase’, ‘limma’, ‘graph’, ‘ReportingTools’, ‘Rgraphviz’, ‘Rcompression’, ‘R2wd’ are not available
+
+# Installation Dependencies
+# "fda", "relimp", "glasso", "huge", "fdrtool", "d3Network", "ggm", "optextras", "mcmc", "gss", "stabledist", "effects", "Ecfun", "ucminf", "gnm", "ca", "stabs", "nnls", "rJava", "qgraph", "lisrelToR", "rockchalk", "BB", "Rcgmin", "Rvmmin", "setRNG", "dfoptim", "svUnit", "goftest", "gamlss.data", "MCMCpack", "MatchIt", "mratios", "snow", "selectr", "fBasics", "estimability", "ibdreg", "ade4TkGUI", "adegraphics", "pixmap", "splancs", "waveslim", "tkrplot", "testit", "gee", "expm", "getopt", "testthat", "gstat", "pbkrtest", "alr4", "coxme", "leaps", "lmtest", "survey", "qvcalc", "glmmML", "pscl", "VGAM", "mlogit", "Ecdat", "geepack", "party", "ordinal", "vcdExtra", "glmnet", "mboost", "lqa", "GAMBoost", "penalized", "mclust", "dichromat", "oz", "randomForest", "bit64", "caret", "plm", "RSQLite", "digest", "assertthat", "RMySQL", "RPostgreSQL", "Lahman", "nycflights13", "trust", "latentnet", "bit", "biglm", "LaF", "gamlss.dist", "diptest", "RUnit", "scagnostics", "tnet", "covr", "XML", "mnormt", "quadprog", "lavaan.survey", "semPlot", "simsem", "stringdist", "nlme", "PKPDmodels", "MEMSS", "mlmRev", "optimx", "gamm4", "HSAUR2", "spatstat", "betareg", "sn", "truncnorm", "AGD", "CALIBERrfimpute", "gamlss", "mitools", "pan", "Zelig", "shapes", "coin", "SimComp", "ISwR", "sgeostat", "PCICt", "RcppOctave", "doMPI", "Rmpi", "snowfall", "whoami", "nor1mix", "ascii", "R.devices", "base64enc", "highlight", "rvest", "rglwidget", "tufte", "robust", "mirt", "AER", "polycor", "Amelia", "lokern", "truncdist", "RANN", "tweedie", "dynlm", "tcltk2", "date", "PerformanceAnalytics", "fTrading", "HSAUR", "lsmeans", "splm", "sphet", "ccaPP", "gam"

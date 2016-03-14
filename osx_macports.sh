@@ -86,9 +86,9 @@ fi
 # Install ports
 ports=$(cat <<EOF
 libGLU
-xorg-server # required for R package: rgl
-glpk        # required for R package: Rglpk
-libiconv    # Required for R package: git2r
+xorg-server-devel # required for R package: rgl
+glpk              # required for R package: Rglpk
+libiconv          # Required for R package: git2r
 openmpi-default
 m4
 tmux

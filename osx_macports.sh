@@ -85,6 +85,7 @@ fi
 
 # Install ports
 ports=$(cat <<EOF
+libGLU
 xorg-server # required for R package: rgl
 glpk        # required for R package: Rglpk
 libiconv    # Required for R package: git2r
@@ -125,7 +126,6 @@ zmq         # Messaging kernel
 gnuplot     # A command-driven interactive function plotting program
 gsl         # A numerical library for C and C++ programmers
 texlive     # LaTeX
-R           # Statistical Language
 git         # A fast version control
 filezilla   # FTP, FTPS and SFTP Client
 

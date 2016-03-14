@@ -40,7 +40,7 @@ function _ver_check() {
     # shellcheck disable=SC2086
     cur_ver=$(defaults read $read_str)
     if [[ "$ver" == "$cur_ver" ]]; then
-      MSG="- Latest version is installed"
+      MSG="- $APPNAME: Latest version is installed"
       return 0
     else
       echo "* A new $APPNAME is available : (v$cur_ver -> v$ver)"

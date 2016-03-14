@@ -68,7 +68,7 @@ else
   fname_tmp="/tmp/$fname"
   if [ ! -f "$fname_tmp" ]; then # if dmg file does not exist
     echo "* Downloading: $fname"
-    curl -oL "$fname_tmp" "$url"
+    curl -Lo "$fname_tmp" "$url"
   fi
 
   hdiutil attach "$fname_tmp" > /dev/null

@@ -1,9 +1,13 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/vacoq)"
 #
+APPNAME="Telegram"
+INSTALL=0
+DIR_APP="/Applications/$APPNAME.app"
+
 _usage() {
   cat<<EOF
-  Telegram OSX Installer Script v16.03.13
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
@@ -11,22 +15,68 @@ _usage() {
   OR
    $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
-  -i | --install : Install Telegram
+  -i | --install : Install $APPNAME
   -h | --help    : Shows this message.
   DESCRIPTION:
-  This script will download and install latest Telegram.
+  This script will download and install/update
+  latest $APPNAME.
 
 EOF
 }
 
-function getUriFilename() {
+
+function _getUriFilename() {
   curl -sI "$1"|
     tr -d '\r'|
     grep -o -E 'Location:.*$'|
     sed 's/Location: //g'
 }
 
-INSTALL=0
+
+function _ver_check() {
+  ver=$(curl -s "https://desktop.telegram.org"|
+        grep -e 'og:description'|
+        grep -oP '[0-9]\.[0-9]\.[0-9][0-9]')
+  if [ -d "$DIR_APP" ]; then
+    read_str="$DIR_APP/Contents/Info.plist CFBundleShortVersionString"
+    # shellcheck disable=SC2086
+    cur_ver=$(defaults read $read_str)
+    if [[ "$ver" == "$cur_ver" ]]; then
+      MSG="- $APPNAME already exist and up-to-date"
+      return 0
+    else
+      echo "* A new $APPNAME is available : v$ver"
+      MSG="* Updated : $APPNAME (ver: $ver)"
+      return 2
+    fi
+  else
+    MSG="* Installed : $APPNAME (ver: $ver)"
+    return 1
+  fi
+  return 1
+}
+
+# Install Telegram
+function _install() {
+  url="https://tdesktop.com/mac"
+  url=$(_getUriFilename "$(_getUriFilename $url)")
+  # in case of download link was not updated,
+  # replace version number by new one.
+  url=${url//[0-9]\.[0-9]\.[0-9][0-9]/$ver}
+  # replace space by %20
+  url=$( printf "%s\n" "$url" | sed 's/ /%20/g')
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ]; then
+    echo "* Downloading: $fname"
+    curl -o "$fname_tmp" "$url"
+  fi
+  hdiutil attach "$fname_tmp" > /dev/null
+  cp -r /Volumes/Telegram\ Desktop/Telegram.app /Applications/
+  hdiutil detach /Volumes/Telegram\ Desktop/ > /dev/null
+}
+
 if [[ ! "$BASH" =~ .*$0.* ]]; then
   while getopts "h?i" opt; do
     case "$opt" in
@@ -41,44 +91,13 @@ else
   INSTALL=1
 fi
 
-if [[ $INSTALL -eq 0 ]]; then
-  _usage
-  exit 0
-fi
-
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
-
-dir_app="/Applications/Telegram.app"
-# shellcheck disable=SC1003
-ver=$(curl -s "https://desktop.telegram.org"|
-      grep -e 'og:description'|
-      sed 's/content=\"v /\'$'\n/g'|
-      sed 's/ /\'$'\n/g'|
-      grep -e '[0-9]\.[0-9]\.[0-9][0-9]')
-if [ -d "$dir_app" ]; then
-  cur_ver="$(defaults read $dir_app/Contents/Info.plist CFBundleShortVersionString)"
-  if [[ "$ver" == "$cur_ver" ]]; then
-    echo "- Telegram already exist and up-to-date. (ver: $ver)"
-    exit 0
+if [[ $INSTALL -eq 0 ]]; then _usage
+else
+  if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "This script is ONLY for MAC OSX."
+  else
+    _ver_check
+    if [[ $? -ne 0 ]]; then _install; fi
+    echo "$MSG"
   fi
 fi
-
-# Install Telegram
-url="https://tdesktop.com/mac"
-url=$(getUriFilename "$(getUriFilename $url)")
-url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-fname=${url##*/} # get filename
-fname_tmp="/tmp/$fname"
-if [ ! -f "$fname_tmp" ]; then # if dmg file does not exist
-  echo "* Downloading: $fname"
-  curl -o "$fname_tmp" "$url"
-fi
-hdiutil attach "$fname_tmp" > /dev/null
-cp -r /Volumes/Telegram\ Desktop/Telegram.app /Applications/
-hdiutil detach /Volumes/Telegram\ Desktop/ > /dev/null
-echo "* Installed: Telegram"
-
-

@@ -2,11 +2,11 @@
 # sh -c "$(curl -sL https://git.io/vacoq)"
 #
 APPNAME="Telegram"
-INSTALL=0
-FORCE=0
 DIR_APP="/Applications/$APPNAME.app"
 ONLYMAC="This script is ONLY for MAC OSX."
 URL="https://tdesktop.com/mac"
+INSTALL=0
+FORCE=0
 
 function _usage() {
   cat<<EOF
@@ -14,7 +14,7 @@ function _usage() {
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-   $ $0 -ih
+   $ $0 -ifh
   OR
    $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
@@ -60,16 +60,16 @@ function _ver_check() {
     cur_ver=$(defaults read $read_str)
     if [[ "$VER" == "$cur_ver" ]]; then
       MSG="- $APPNAME: Latest version is installed"
-      return 0
+      INSTALL=0
     else
       echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
       MSG="* Updated : $APPNAME to version v$VER"
-      return 2
+      INSTALL=2
     fi
   else
     MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
   fi
-  return 1
 }
 
 # $1 : url
@@ -122,10 +122,6 @@ fi
 if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
 if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 
-if [[ $FORCE -eq 0 ]]; then
-  _ver_check
-  if [[ $? -ne 0 ]]; then _install; fi
-else
-  _install
-fi
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
 echo "$MSG"

@@ -1,29 +1,105 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/v2pDA)"
 #
-_usage() {
+[[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
+APPNAME="Sublime Text"
+DIR_APP="/Applications/$APPNAME.app"
+ONLYMAC="This script is ONLY for MAC OSX."
+URL="https://www.sublimetext.com/3"
+INSTALL=0
+FORCE=0
+ANSWER=0
+
+function _usage() {
   cat<<EOF
-  Sublime Text OSX Installer Script v16.03.11
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ $0 -ih
+   $ $0 -ifyh
   OR
-    $ sh -c "\$(curl -sL https://git.io/v2pDA)"
+   $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
-  -i  | --install : Install Sublime Text
-  -y  | -- yes    : Do not promt, install everything.
-  -h  | --help    : Shows this message.
+  -i | --install : Install $APPNAME
+  -f | --force   : Force to reinstall
+  -y | -- yes    : Do not promt, install everything
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will download and install latest
-  Sublime Text and whole predefined plugins and settings.
+  This script will download and install/update
+  latest $APPNAME and whole predefined plugins and
+  settings.
+
 EOF
 }
 
-INSTALL=0
-ANSWER=0
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    FURL=$(curl -s "$URL"|
+           grep -oP 'https\S*Sublime Text Build [0-9][0-9][0-9][0-9].dmg')
+  fi
+}
+
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    _get_FURL
+    VER=$(echo "$FURL"|grep -oP '[0-9][0-9][0-9][0-9]')
+  fi
+}
+
+function _ver_check() {
+  _get_VER
+  if [ -d "$DIR_APP" ]; then
+    read_str="$DIR_APP/Contents/Info.plist CFBundleVersion"
+    # shellcheck disable=SC2086
+    cur_ver=$(defaults read $read_str)
+    if [[ "$VER" == "$cur_ver" ]]; then
+      MSG="- $APPNAME: Latest version is installed"
+      INSTALL=0
+    else
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
+      INSTALL=2
+    fi
+  else
+    MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
+  fi
+}
+
+# $1 : file path to attach
+# $2 : Path to Volume
+# $3 : Path to install dir
+function _setup() {
+  idir=$3
+  if [ -z "${3+x}" ]; then idir="/Applications/"; fi
+  DIR=$(dirname "${2}")
+  hdiutil attach "$1" > /dev/null
+  cp -r "/Volumes$2" $idir
+  hdiutil detach "/Volumes$DIR/" > /dev/null
+}
+
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if installer is not exist
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
+    url=$(sed 's/ /%20/g' "$url") # replace space by %20
+    curl -# -Lo "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+# Install Telegram
+function _install() {
+  _get_VER
+  fname_tmp=$(_download "$FURL")
+  _setup "$fname_tmp" "/Sublime Text/Sublime Text.app"
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
+}
+
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?iy" opt; do
+  while getopts "h?iyf" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
@@ -31,26 +107,22 @@ if [[ ! "$BASH" =~ .*$0.* ]]; then
       ;;
       y) ANSWER=1
       ;;
+      f) FORCE=1
+      ;;
     esac
   done
   shift $((OPTIND-1))
 else
   INSTALL=1
   ANSWER=1
+  FORCE=0
 fi
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 
-if [[ $INSTALL -eq 0 ]]; then
-  _usage
-  exit 0
-fi
-
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
-
-# Handle right user name
-[[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
+exit
 
 # install sublime text
 dir_app="/Applications/Sublime Text.app"

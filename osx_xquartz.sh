@@ -2,12 +2,12 @@
 # sh -c "$(curl -sL https://git.io/vaWJa)"
 #
 APPNAME="XQuartz"
-INSTALL=0
-FORCE=0
 DIR_APP="/Applications/Utilities/$APPNAME.app"
 ONLYMAC="This script is ONLY for MAC OSX."
 RUNSUDO="Run with sudo."
 URL="http://www.xquartz.org"
+INSTALL=0
+FORCE=0
 
 function _usage() {
   cat<<EOF
@@ -36,25 +36,31 @@ function _get_FURL() {
   fi
 }
 
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    _get_FURL
+    VER=$(echo "$FURL"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+  fi
+}
+
 function _ver_check() {
-  _get_FURL
-  ver=$(echo "$FURL"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+  _get_VER
   if [ -d "$DIR_APP" ]; then
     read_str="$DIR_APP/Contents/Info.plist CFBundleShortVersionString"
     # shellcheck disable=SC2086
     cur_ver=$(defaults read $read_str)
-    if [[ "$ver" == "$cur_ver" ]]; then
+    if [[ "$VER" == "$cur_ver" ]]; then
       MSG="- $APPNAME: Latest version is installed"
-      return 0
+      INSTALL=0
     else
-      echo "* A new $APPNAME is available : (v$cur_ver -> v$ver)"
-      MSG="* Updated : $APPNAME to version v$ver"
-      return 2
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
+      INSTALL=2
     fi
   else
-    MSG="* Installed : $APPNAME v$ver"
+    MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
   fi
-  return 1
 }
 
 # $1 : url
@@ -63,7 +69,7 @@ function _download() {
   fname=${url##*/} # get filename
   fname_tmp="/tmp/$fname"
   # if dmg file does not exist
-  if [ ! -f "$fname_tmp" ]; then
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
     curl -# -Lo "$fname_tmp" "$url"
   fi
   echo "$fname_tmp"
@@ -78,9 +84,10 @@ function _setup() {
 }
 
 function _install() {
-  _get_FURL
+  _get_VER
   fname_tmp=$(_download "$FURL")
   _setup "$fname_tmp"
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
 }
 
 if [[ ! "$BASH" =~ .*$0.* ]]; then
@@ -103,10 +110,6 @@ if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
 if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 if [[ $EUID -ne 0 ]]; then echo "$RUNSUDO"; exit; fi
 
-if [[ $FORCE -eq 0 ]]; then
-  _ver_check
-  if [[ $? -ne 0 ]]; then _install; fi
-else
-  _install
-fi
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
 echo "$MSG"

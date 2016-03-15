@@ -86,11 +86,13 @@ function _install() {
 }
 
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?if" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
       i) INSTALL=1
+      ;;
+      f) FORCE=1
       ;;
     esac
   done

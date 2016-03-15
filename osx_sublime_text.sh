@@ -506,7 +506,6 @@ if [[ ! "$BASH" =~ .*$0.* ]]; then
   shift $((OPTIND-1))
 else
   INSTALL=1
-  FORCE=0
   PREDEFINED=1
 fi
 if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi

@@ -76,6 +76,7 @@ gsl         # A numerical library for C and C++ programmers
 texlive     # LaTeX
 git         # A fast version control
 filezilla   # FTP, FTPS and SFTP Client
+meld
 
 python27
 py27-virtualenv         # virtualenv is a tool to create isolated Python
@@ -245,23 +246,21 @@ while read p; do
 done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 
 # Add export statement into bash_profile
+exports=$(cat <<EOF
+export PATH="/opt/local/bin:/opt/local/sbin:\$PATH" # for ports
+export PATH="/opt/local/libexec/gnubin:\$PATH" # for GNU tools
+export PYTHONPATH=/opt/local/lib/python2.7/site-packages/:\$PYTHONPATH # For Meld
+EOF
+)
 for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
   if [ -f "$fl" ]; then
-    # Add required path macports to work properly.
-    exp="/opt/local/bin:/opt/local/sbin"
-    if ! grep -q "$exp" "$fl"; then
-      note="# Macports OSX Installer addition on $(date +'%Y-%m-%d %H:%M:%S')"
-      str="\n##\n%s\nexport PATH=\"%s:\$PATH\" # for macports\n"
-      # shellcheck disable=SC2059
-      printf "$str" "$note" "$exp" >> "$fl"
-    fi
-
-    # Make GNU tools default.
-    exp="/opt/local/libexec/gnubin"
-    if ! grep -q "$exp" "$fl"; then
-      printf "export PATH=\"%s:\$PATH\" # for GNU tools\n" "$exp" >> "$fl"
-    fi
-    source "$fl"
+    fmt="\n##\n%s\n"
+    note="# Macports OSX Installer addition on "
+    # shellcheck disable=SC2059
+    grep -q "$note" "$fl" || printf "$fmt" "$note$(date +'%Y-%m-%d %H:%M:%S')" >> "$fl"
+    while read e; do
+      grep -q "$e" "$fl" || echo "$e" >> "$fl"
+    done <<< "$exports"
     break
   fi
 done

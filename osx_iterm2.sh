@@ -1,26 +1,90 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/vaT0V)"
 #
-_usage() {
+APPNAME="iTerm"
+DIR_APP="/Applications/$APPNAME.app"
+ONLYMAC="This script is ONLY for MAC OSX."
+URL="https://www.iterm2.com/downloads.html"
+INSTALL=0
+FORCE=0
+
+function _usage() {
   cat<<EOF
-  iTerm2 OSX Installer Script v16.03.09
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-   $ $0 -ih
+   $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vaT0V)"
+   $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
-  -i  | --install : Install iTerm2
-  -h  | --help    : Shows this message.
+  -i | --install : Install $APPNAME
+  -f | --force   : Force to reinstall
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will download and install latest (even Beta)
-  iTerm2 and whole predefined settings.
+  This script will download and install/update
+  latest $APPNAME.
 
 EOF
 }
 
-INSTALL=0
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    FURL="$(curl -s "$URL"|
+           grep -oP 'https\S*iTerm2-[0-9]_[0-9]_[0-9]\S*zip'|
+           sort -t_ -rn -k1,1 -k2,2 -k3,3|
+           head -1)"
+  fi
+}
+
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    _get_FURL
+    VER=$(echo "$FURL"|
+          grep -oP '[0-9]_[0-9]_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'|
+          sed 's/_/\./g')
+  fi
+}
+
+function _ver_check() {
+  _get_VER
+  if [ -d "$DIR_APP" ]; then
+    read_str="$DIR_APP/Contents/Info.plist CFBundleShortVersionString"
+    # shellcheck disable=SC2086
+    cur_ver=$(defaults read $read_str)
+    if [[ "$VER" == "$cur_ver" ]]; then
+      MSG="- $APPNAME: Latest version is installed"
+      INSTALL=0
+    else
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
+      INSTALL=2
+    fi
+  else
+    MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
+  fi
+}
+
+# $1 : url
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
+    curl -# -Lo "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+function _install() {
+  _get_VER
+  fname_tmp=$(_download "$FURL")
+  unzip -qo "$fname_tmp" -d /Applications
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
+}
+
 if [[ ! "$BASH" =~ .*$0.* ]]; then
   while getopts "h?i" opt; do
     case "$opt" in
@@ -35,38 +99,10 @@ else
   INSTALL=1
 fi
 
-if [[ $INSTALL -eq 0 ]]; then
-  _usage
-  exit 0
-fi
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
-
-# install iTerm2
-dir_app="/Applications/iTerm.app"
-if [ -d  "$dir_app" ]; then
-  echo '- iTerm2 already exist.'
-else
-  # get latest iTerm2 download url (even beta)
-  # shellcheck disable=SC1003
-  url=$(curl -s 'https://www.iterm2.com/downloads.html'|
-  grep -e 'iTerm2-[0-9]_[0-9]_[0-9]'|
-  sed 's/\"https/\'$'\nhttps/g'|
-  sed 's/zip\"></zip\'$'\n/g'|
-  grep 'https'|
-  sort -t_ -rn -k1,1 -k2,2 -k3,3|
-  head -1)
-  fname=${url##*/} # get filename
-  url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-  if [ ! -f "$fname" ]; then # if zip file does not exist
-    echo "* Downloading: $fname"
-    curl -s -o "$fname" "$url"
-  fi
-  unzip -qo "$fname" -d /Applications
-  rm "$fname"
-  echo "* Installed: iTerm2"
-fi
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
+echo "$MSG"
 

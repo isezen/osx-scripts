@@ -3,7 +3,10 @@
 #
 APPNAME="Telegram"
 INSTALL=0
+FORCE=0
 DIR_APP="/Applications/$APPNAME.app"
+ONLYMAC="This script is ONLY for MAC OSX."
+URL="https://tdesktop.com/mac"
 
 function _usage() {
   cat<<EOF
@@ -16,7 +19,8 @@ function _usage() {
    $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
   -i | --install : Install $APPNAME
-  -h | --help    : Shows this message.
+  -f | --force   : Force to reinstall
+  -h | --help    : Shows this message
   DESCRIPTION:
   This script will download and install/update
   latest $APPNAME.
@@ -31,24 +35,39 @@ function _getUriFilename() {
     sed 's/Location: //g'
 }
 
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    VER=$(curl -s "https://desktop.telegram.org"|
+          grep -e 'og:description'|
+          grep -oP '[0-9]\.[0-9]\.[0-9][0-9]')
+  fi
+}
+
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    _get_VER
+    FURL=$(_getUriFilename "$(_getUriFilename $URL)")
+    FURL=${FURL//[0-9]\.[0-9]\.[0-9][0-9]/$VER}
+    FURL=$( printf "%s\n" "$FURL" | sed 's/ /%20/g')
+  fi
+}
+
 function _ver_check() {
-  ver=$(curl -s "https://desktop.telegram.org"|
-        grep -e 'og:description'|
-        grep -oP '[0-9]\.[0-9]\.[0-9][0-9]')
+  _get_VER
   if [ -d "$DIR_APP" ]; then
     read_str="$DIR_APP/Contents/Info.plist CFBundleShortVersionString"
     # shellcheck disable=SC2086
     cur_ver=$(defaults read $read_str)
-    if [[ "$ver" == "$cur_ver" ]]; then
+    if [[ "$VER" == "$cur_ver" ]]; then
       MSG="- $APPNAME: Latest version is installed"
       return 0
     else
-      echo "* A new $APPNAME is available : (v$cur_ver -> v$ver)"
-      MSG="* Updated : $APPNAME to version v$ver"
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
       return 2
     fi
   else
-    MSG="* Installed : $APPNAME v$ver"
+    MSG="* Installed : $APPNAME v$VER"
   fi
   return 1
 }
@@ -59,7 +78,7 @@ function _download() {
   fname=${url##*/} # get filename
   fname_tmp="/tmp/$fname"
   # if dmg file does not exist
-  if [ ! -f "$fname_tmp" ]; then
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
     curl -# -o "$fname_tmp" "$url"
   fi
   echo "$fname_tmp"
@@ -79,37 +98,34 @@ function _setup() {
 
 # Install Telegram
 function _install() {
-  url="https://tdesktop.com/mac"
-  url=$(_getUriFilename "$(_getUriFilename $url)")
-  # in case of download link was not updated,
-  # replace version number by new one.
-  url=${url//[0-9]\.[0-9]\.[0-9][0-9]/$ver}
-  # replace space by %20
-  url=$( printf "%s\n" "$url" | sed 's/ /%20/g')
-  fname_tmp=$(_download "$url")
+  _get_FURL
+  fname_tmp=$(_download "$FURL")
   _setup "$fname_tmp" "/Telegram Desktop/Telegram.app"
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
 }
 
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?if" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
       i) INSTALL=1
       ;;
+      f) FORCE=1
+      ;;
     esac
   done
   shift $((OPTIND-1))
 else
-  INSTALL=1
+  INSTALL=1; FORCE=0
 fi
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 
-if [[ $INSTALL -eq 0 ]]; then _usage; else
-  if [[ "$OSTYPE" != "darwin"* ]]; then
-    echo "This script is ONLY for MAC OSX."
-  else
-    _ver_check
-    if [[ $? -ne 0 ]]; then _install; fi
-    echo "$MSG"
-  fi
+if [[ $FORCE -eq 0 ]]; then
+  _ver_check
+  if [[ $? -ne 0 ]]; then _install; fi
+else
+  _install
 fi
+echo "$MSG"

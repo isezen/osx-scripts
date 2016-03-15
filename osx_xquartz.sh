@@ -1,74 +1,112 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/vaWJa)"
 #
-_usage() {
+APPNAME="XQuartz"
+INSTALL=0
+FORCE=0
+DIR_APP="/Applications/Utilities/$APPNAME.app"
+ONLYMAC="This script is ONLY for MAC OSX."
+RUNSUDO="Run with sudo."
+URL="http://www.xquartz.org"
+
+function _usage() {
   cat<<EOF
-  XQuartz OSX Installer Script v16.03.14
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ $0 -ih
+   $ $0 -ifh
   OR
-    $ sh -c "\$(curl -sL https://git.io/vaWJa)"
+   $ sh -c "\$(curl -sL https://git.io/vaWJa)"
   ARGUMENTS:
-  -i  | --install : Install XQuartz
-  -h  | --help    : Shows this message.
+  -i | --install : Install $APPNAME
+  -f | --force   : Force to reinstall
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will download and install latest
-  XQuartz.
+  This script will download and install/update
+  latest $APPNAME.
+
 EOF
 }
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    FURL=$(curl -s "$URL"|
+           grep -oP 'https\S*XQuartz-[0-9]\.[0-9]\.[0-9].dmg')
+  fi
+}
 
-INSTALL=0
+function _ver_check() {
+  _get_FURL
+  ver=$(echo "$FURL"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+  if [ -d "$DIR_APP" ]; then
+    read_str="$DIR_APP/Contents/Info.plist CFBundleShortVersionString"
+    # shellcheck disable=SC2086
+    cur_ver=$(defaults read $read_str)
+    if [[ "$ver" == "$cur_ver" ]]; then
+      MSG="- $APPNAME: Latest version is installed"
+      return 0
+    else
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$ver)"
+      MSG="* Updated : $APPNAME to version v$ver"
+      return 2
+    fi
+  else
+    MSG="* Installed : $APPNAME v$ver"
+  fi
+  return 1
+}
+
+# $1 : url
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ]; then
+    curl -# -Lo "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+# $1 : file path to attach
+function _setup() {
+  fname=$(basename "${1}")
+  hdiutil attach "$1" > /dev/null
+  installer -pkg "/Volumes/${fname%.dmg}/$APPNAME.pkg" -target /
+  hdiutil detach "/Volumes/${fname%.dmg}/" > /dev/null
+}
+
+function _install() {
+  _get_FURL
+  fname_tmp=$(_download "$FURL")
+  _setup "$fname_tmp"
+}
+
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?if" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
       i) INSTALL=1
       ;;
+      f) FORCE=1
+      ;;
     esac
   done
   shift $((OPTIND-1))
-
-  if [[ $INSTALL -eq 0 ]]; then
-    _usage
-    exit 0
-  fi
 else
   INSTALL=1
+  FORCE=0
 fi
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
+if [[ $EUID -ne 0 ]]; then echo "$RUNSUDO"; exit; fi
 
-if [[ $EUID -ne 0 ]]; then
-  echo "Run with sudo."
-  exit 1
-fi
-
-# download and install XQuartz
-if [ -d "/Applications/Utilities/XQuartz.app" ]; then
-  echo '- XQuartz already exist.'
+if [[ $FORCE -eq 0 ]]; then
+  _ver_check
+  if [[ $? -ne 0 ]]; then _install; fi
 else
-  # get latest XQuartz download url
-  # shellcheck disable=SC1003
-  url=$(curl -s "http://www.xquartz.org"|
-        grep -e 'XQuartz-[0-9]\.[0-9]\.[0-9].\+\.dmg'|
-        sed 's/\"https/\'$'\nhttps/g'|
-        sed 's/\">/\'$'\n/g'|
-        grep 'https')
-  fname=${url##*/} # get filename
-  fname_tmp="/tmp/$fname"
-  url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-  if [ ! -f "$fname_tmp" ]; then # if dmg file does not exist
-    echo "* Downloading: $fname"
-    curl -Lo "$fname_tmp" "$url"
-  fi
-  hdiutil attach "$fname_tmp" > /dev/null
-  installer -pkg /Volumes/"${fname%.dmg}"/XQuartz.pkg -target /
-  hdiutil detach /Volumes/"${fname%.dmg}"/ > /dev/null
-  echo "* Installed: XQuartz"
+  _install
 fi
+echo "$MSG"

@@ -1,37 +1,113 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/vaq3J)"
 #
-_usage() {
+[[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
+APPNAME="R"
+ONLYMAC="This script is ONLY for MAC OSX."
+RUNSUDO="Run with sudo."
+URL="https://cran.r-project.org/bin/macosx/"
+INSTALL=0
+FORCE=0
+MP=0
+
+function _usage() {
   cat<<EOF
-  R OSX Installer Script v16.03.11
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -imh
+   $ $0 -imfh
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/vaq3J)"
+   $ sh -c "\$(curl -sL https://git.io/vaq3J)"
   ARGUMENTS:
-  -i  | --install  : Install R
+  -i | --install : Install $APPNAME
   -m  | --macports : Install by macports
-  -h  | --help     : Shows this message.
+  -f | --force   : Force to reinstall
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will download and install latest R.
-  If you set -m parameter, R is installed using
-  macports; otherwise, is installed from CRAN
-  official web site. If newer R release exist,
-  it is upgraded.
+  This script will download and install/update
+  latest $APPNAME. If you set -m parameter,
+  R is installed using macports; otherwise,
+  is installed from CRAN official web site.
+  If newer R release exist, it is upgraded.
+
 EOF
 }
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    FURL="$URL$(curl -s "$URL"|
+                grep -oP 'R-[0-9]\.[0-9]\.[0-9]\.pkg'|
+                head -1)"
+  fi
+}
 
-INSTALL=0
-MP=0
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    local var=
+    if [[ $MP -eq 0 ]]; then
+      _get_FURL
+      var="$FURL"
+    else
+      var=$(port info R)
+    fi
+    VER=$(echo "$var"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+  fi
+}
+
+function _ver_check() {
+  _get_VER
+  if hash R 2>/dev/null; then
+    local r_loc
+    local cur_ver
+    r_loc="$(which R)"
+    cur_ver=$($r_loc --version|grep -oP '[0-9]\.[0-9]\.[0-9]'|head -1)
+
+    if [[ "$VER" == "$cur_ver" ]]; then
+      MSG="- $APPNAME: Latest version is installed"
+      INSTALL=0
+    else
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
+      INSTALL=2
+    fi
+  else
+    MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
+  fi
+}
+
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
+    curl -# -Lo "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+function _install() {
+  _get_VER
+  if [[ $MP -eq 0 ]]; then
+    fname_tmp=$(_download "$FURL")
+    installer -pkg "$fname_tmp" -target /
+  else
+    var=$(port installed R)
+    if [[ $var =~ .*None.* ]]; then
+      port install R +builtin_lapack +cairo +gcc5 +recommended +tcltk +x11
+    else
+      echo "- R already installed."
+      echo "- If you want to upgrade; run:"
+      echo "$ sudo port selfupdate && sudo port upgrade outdated"
+    fi
+  fi
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
+}
+
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?im" opt; do
+  while getopts "h?imf" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
@@ -39,83 +115,24 @@ if [[ ! "$BASH" =~ .*$0.* ]]; then
       ;;
       m) MP=1
       ;;
+      f) FORCE=1
+      ;;
     esac
   done
   shift $((OPTIND-1))
-
-  if [[ $INSTALL -eq 0 ]]; then
-    _usage
-    exit 0
-  fi
 else
   INSTALL=1
-  # if auto-install, check macports.
-  # if exist, install macports version.
-  if hash port 2>/dev/null; then
-    MP=1
+  if hash port 2>/dev/null; then MP=1; fi
+fi
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
+if [[ $EUID -ne 0 ]]; then echo "$RUNSUDO"; exit; fi
+if [[ $MP -ne 0 ]]; then
+  if ! hash port 2>/dev/null; then
+    echo "* Macports is not installed"; exit
   fi
 fi
 
-if [[ $EUID -ne 0 ]]; then
-  echo "Run with sudo."
-  exit 1
-fi
-
-if [[ $MP -eq 0 ]]; then
-  # Check installed R version if exist
-  ver=
-  # shellcheck disable=SC1003
-  if [ -f /usr/bin/R ]; then
-    ver=$(/usr/bin/R --version |
-          grep -e '[0-9]\.[0-9]\.[0-9]'|
-          sed 's/version /\'$'\n1a2wc=/g'|
-          sed 's/ (/\'$'\n/g'|
-          grep '1a2wc='|
-          sed 's/1a2wc=//g')
-  fi
-  # get latest R download url
-  urlp="https://cran.r-project.org/bin/macosx/"
-  # shellcheck disable=SC1003
-  fname=$(curl -s "$urlp"|
-          grep -e 'R-[0-9]\.[0-9]\.[0-9]\.pkg'|
-          sed 's/href=\"/\'$'\nhref/g'|
-          sed 's/\">/\'$'\n/g'|
-          grep 'href'|
-          sed 's/href//g')
-  url="$urlp$fname"
-  url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-  ver2=${fname#*-}; ver2=${ver2%.*}
-
-  # Compare installed and remote version numbers
-  if [ -n "$ver" ]; then
-    if [ "$ver" == "$ver2" ]; then
-      echo "- R already exist and up-to-date! Version: $ver"
-      INSTALL=0
-    else
-      echo "- A new R Version ($ver > $ver2) exist."
-    fi
-  else
-    echo "* Installing R Version ($ver2)"
-  fi
-
-  if [[ $INSTALL -eq 1 ]]; then
-    fname_tmp="/tmp/$fname"
-    if [ ! -f "$fname_tmp" ]; then # if pkg file does not exist
-      echo "* Downloading: $fname"
-      curl -o "$fname_tmp" "$url"
-    fi
-    installer -pkg "$fname_tmp" -target /
-    rm "$fname_tmp"
-    echo "* Installed: R ($ver2)"
-  fi
-else
-  var=$(port installed R)
-  if [[ $var =~ .*None.* ]]; then
-    port install R
-    echo
-  else
-    echo "- R already installed."
-    echo "- If you want to upgrade; run:"
-    echo "$ sudo port selfupdate && sudo port upgrade outdated"
-  fi
-fi
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
+echo "$MSG"

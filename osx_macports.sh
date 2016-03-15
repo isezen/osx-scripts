@@ -1,89 +1,36 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/v2pMc)"
 #
-_usage() {
+[[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
+APPNAME="Macports"
+ONLYMAC="This script is ONLY for MAC OSX."
+RUNSUDO="Run with sudo."
+URL="https://www.macports.org/install.php"
+INSTALL=0
+FORCE=0
+
+function _usage() {
   cat<<EOF
-  Macports OSX Installer Script v16.03.09
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -ih
+   $ $0 -ifh
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/v2pMc)"
+   $ sh -c "\$(curl -sL https://git.io/v2pMc)"
   ARGUMENTS:
-  -i  | --install : Install Macports
-  -h  | --help    : Shows this message.
+  -i | --install : Install $APPNAME
+  -f | --force   : Force to reinstall
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will download and install latest
-  macports and all predefined ports and settings.
+  This script will download and install
+  latest $APPNAME and app predefined ports
+  and settings.
+
 EOF
 }
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
-
-INSTALL=0
-if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
-    case "$opt" in
-      h|\?) INSTALL=0
-      ;;
-      i) INSTALL=1
-      ;;
-    esac
-  done
-  shift $((OPTIND-1))
-
-  if [[ $INSTALL -eq 0 ]]; then
-    _usage
-    exit 0
-  fi
-else
-  INSTALL=1
-fi
-
-if [[ $EUID -ne 0 ]]; then
-  echo "Run with sudo."
-  exit 1
-fi
-
-# Check if XCode was installed
-if [ ! -d "/Applications/Xcode.app" ]; then
-  echo '* Please, install Xcode first.'; exit 0
-fi
-
-# download and install Macports
-if hash port 2>/dev/null; then
-  echo '- macports already exist.'
-  # if macports was installed
-  # prepare ports to install or update.
-  port selfupdate
-  port upgrade outdated
-else
-  # get latest Macports download url
-  url="https://www.macports.org/install.php"
-  # shellcheck disable=SC1003
-  # TODO: Add download due to OSX version.
-  url=$(curl -s "$url"|
-        grep -e 'ElCapitan.pkg'|
-        sed 's/\"https/\'$'\n\"https/g'|
-        sed 's/\"/\"\'$'\n/2'|
-        grep 'https'|
-        uniq)
-  url="${url//\"}" # remove " symbols, curl complains
-  fname=${url##*/} # get filename
-  fname_tmp="/tmp/$fname"
-  url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-  if [ ! -f "$fname_tmp" ]; then # if pkg file does not exist
-    echo "* Downloading: $fname"
-    curl -s -o "$fname_tmp" "$url"
-  fi
-  installer -pkg "$fname_tmp" -target /
-fi
-
-# Install ports
+# Ports to install
 ports=$(cat <<EOF
 libGLU
 xorg-server-devel # required for R package: rgl
@@ -204,6 +151,88 @@ opencv +python27
 vim +python27           # Python Scripting with vim
 EOF
 )
+
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    FURL="$(curl -s "$URL"|
+                grep -oP 'https\S*MacPorts-[0-9]\.[0-9]\.[0-9]\S*pkg'|
+                head -1)"
+  fi
+}
+
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    _get_FURL
+    VER=$(echo "$FURL"|
+          grep -oP '[0-9]\.[0-9]\.[0-9]')
+  fi
+}
+
+function _ver_check() {
+  _get_VER
+  if hash port 2>/dev/null; then
+    cur_ver=$(port version)
+    cur_ver=$(echo "$cur_ver"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+    if [[ "$VER" == "$cur_ver" ]]; then
+      MSG="- $APPNAME: Latest version is installed"
+      INSTALL=0
+    else
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
+      INSTALL=2
+    fi
+  else
+    MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
+  fi
+}
+
+# $1 : url
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
+    curl -# -Lo "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+function _install() {
+  _get_VER
+  fname_tmp=$(_download "$FURL")
+  installer -pkg "$fname_tmp" -target /
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
+}
+
+if [[ ! "$BASH" =~ .*$0.* ]]; then
+  while getopts "h?if" opt; do
+    case "$opt" in
+      h|\?) INSTALL=0
+      ;;
+      i) INSTALL=1
+      ;;
+      f) FORCE=1
+      ;;
+    esac
+  done
+  shift $((OPTIND-1))
+else
+  INSTALL=1
+  FORCE=0
+fi
+
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
+if [ ! -d "/Applications/Xcode.app" ]; then
+  echo '* Please, install Xcode first.'; exit
+fi
+if [[ $EUID -ne 0 ]]; then echo "$RUNSUDO"; exit; fi
+
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
+echo "$MSG"
 
 while read p; do
   # shellcheck disable=SC2086

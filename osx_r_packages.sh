@@ -1,71 +1,36 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/vaCty)"
 #
-_usage() {
+APPNAME="R Packages"
+ONLYMAC="This script is ONLY for MAC OSX."
+RUNSUDO="Run with sudo."
+URL="https://cran.r-project.org/bin/macosx/"
+INSTALL=0
+ALL=0
+FORCE=0
+MP=0
+
+function _usage() {
   cat<<EOF
-  R packages OSX Installer Script v16.03.09
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ sudo $0 -ih
+   $ $0 -imfh
   OR
-    $ sudo sh -c "\$(curl -sL https://git.io/vaCty)"
+   $ sh -c "\$(curl -sL https://git.io/vaCty)"
   ARGUMENTS:
-  -i | --install : Install R Packages
+  -i | --install : Install $APPNAME
   -a | --all     : for All users
-  -h | --help    : Shows this message.
+  -f | --force   : Force to install
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will install predefined R packages.
+  This script will install predefined $APPNAME.
+
 EOF
 }
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
-
-INSTALL=0
-ALL=0
-if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?ia" opt; do
-    case "$opt" in
-      h|\?) INSTALL=0
-      ;;
-      i) INSTALL=1
-      ;;
-      a) ALL=1
-      ;;
-    esac
-  done
-  shift $((OPTIND-1))
-
-  if [[ $INSTALL -eq 0 ]]; then
-    _usage
-    exit 0
-  fi
-else
-  INSTALL=1
-  ALL=1
-fi
-
-if [[ $EUID -ne 0 ]]; then
-  echo "Run with sudo."
-  exit 1
-fi
-
-# Check if XCode was installed
-r_exist=0
-for fl in /usr/bin/R /opt/local/bin/R; do
-  if [ -f  $fl ]; then
-    r_exist=1
-    break
-  fi
-done
-
-if [[ $r_exist -eq 0 ]]; then
-  echo "Please, install R."
-fi
-
+function _predefined_packages() {
 # Install R packages
 rpkgs=$(cat <<EOF
 abind           # Combine multidimensional arrays into a single array
@@ -382,8 +347,43 @@ yaml            # This package implements the libyaml YAML 1.1 parser and emitte
 zoo             # An S3 class with methods for totally ordered indexed
 EOF
 )
+}
 
-# remove comment lines
+if [[ ! "$BASH" =~ .*$0.* ]]; then
+  while getopts "h?ia" opt; do
+    case "$opt" in
+      h|\?) INSTALL=0
+      ;;
+      i) INSTALL=1
+      ;;
+      a) ALL=1
+      ;;
+    esac
+  done
+  shift $((OPTIND-1))
+else
+  INSTALL=1
+  ALL=1
+fi
+
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
+
+
+# Check if R was installed
+r_exist=0
+for fl in /usr/bin/R /opt/local/bin/R; do
+  if [ -f  $fl ]; then
+    r_exist=1
+    break
+  fi
+done
+
+if [[ $r_exist -eq 0 ]]; then
+  echo "Please, install R."
+fi
+
+_predefined_packages
 # shellcheck disable=SC2001
 pkgs=$(echo "$rpkgs" | sed -e 's/#.*$//')
 pkgs=$(echo "$pkgs" | uniq) # remove duplicate entries and sort
@@ -404,7 +404,7 @@ ip <- function(p){
     cat("Following", lnp, "packages will be installed:\n")
     cat(np, "\n\n")
     install.packages(np, lib=lib, dependencies = TRUE, quiet=F,
-                     Ncpus=2, repos="https://cran.rstudio.com/")
+                     Ncpus=1, repos="https://cran.rstudio.com/")
     failed <- np[!(np %in% installed.packages()[, "Package"])]
     n_failed <- length(failed)
     if(n_failed){

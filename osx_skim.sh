@@ -1,80 +1,123 @@
 #!/bin/bash
 # sh -c "$(curl -sL https://git.io/vaJg2)"
 #
-_usage() {
+APPNAME="Skim"
+DIR_APP="/Applications/$APPNAME.app"
+ONLYMAC="This script is ONLY for MAC OSX."
+URL_MAIN="https://sourceforge.net"
+URL="$URL_MAIN/projects/skim-app/files/Skim/"
+INSTALL=0
+FORCE=0
+
+function _usage() {
   cat<<EOF
-  Skim PDF OSX Installer Script v16.03.09
+  $APPNAME OSX Installer Script v16.03.14
   Ismail SEZEN sezenismail@gmail.com 2016
   WARNING: ONLY FOR OSX
   USAGE:
-    $ $0 -ih
+   $ $0 -ifh
   OR
-    $ sh -c "\$(curl -sL https://git.io/vaJg2)"
+   $ sh -c "\$(curl -sL https://git.io/vacoq)"
   ARGUMENTS:
-  -i  | --install : Install Skim PDF
-  -h  | --help    : Shows this message.
+  -i | --install : Install $APPNAME
+  -f | --force   : Force to reinstall
+  -h | --help    : Shows this message
   DESCRIPTION:
-  This script will download and install latest Skim.app
+  This script will download and install/update
+  latest $APPNAME.
+
 EOF
 }
 
-if [[ "$OSTYPE" != "darwin"* ]]; then
-  echo "This script is ONLY for MAC OSX."
-  exit 0
-fi
+function _get_FURL() {
+  if [ -z "${FURL+x}" ]; then
+    URL="$URL_MAIN/$(curl -s "$URL"|
+           grep -oP '/\S*Skim-[0-9]\.[0-9]\.[0-9][0-9]/'|head -1)"
+    FURL=$(curl -s "$URL"|
+          grep -oP 'https\S*Skim-[0-9]\.[0-9]\.[0-9][0-9].dmg')
+  fi
+}
 
-INSTALL=0
+function _get_VER() {
+  if [ -z "${VER+x}" ]; then
+    _get_FURL
+    VER=$(echo "$FURL"|
+          grep -oP '[0-9]\.[0-9]\.[0-9][0-9]'|head -1)
+  fi
+}
+
+function _ver_check() {
+  _get_VER
+  if [ -d "$DIR_APP" ]; then
+    read_str="$DIR_APP/Contents/Info.plist CFBundleShortVersionString"
+    # shellcheck disable=SC2086
+    cur_ver=$(defaults read $read_str)
+    if [[ "$VER" == "$cur_ver" ]]; then
+      MSG="- $APPNAME: Latest version is installed"
+      INSTALL=0
+    else
+      echo "* A new $APPNAME is available : (v$cur_ver -> v$VER)"
+      MSG="* Updated : $APPNAME to version v$VER"
+      INSTALL=2
+    fi
+  else
+    MSG="* Installed : $APPNAME v$VER"
+    INSTALL=1
+  fi
+}
+
+# $1 : file path to attach
+# $2 : Path to Volume
+# $3 : Path to install dir
+function _setup() {
+  idir=$3
+  if [ -z "${3+x}" ]; then idir="/Applications/"; fi
+  DIR=$(dirname "${2}")
+  hdiutil attach "$1" > /dev/null
+  cp -r "/Volumes$2" $idir
+  hdiutil detach "/Volumes$DIR/" > /dev/null
+}
+
+# $1 : url
+function _download() {
+  url="$1"
+  fname=${url##*/} # get filename
+  fname_tmp="/tmp/$fname"
+  # if dmg file does not exist
+  if [ ! -f "$fname_tmp" ] || [ $FORCE -ne 0 ]; then
+    curl -# -Lo "$fname_tmp" "$url"
+  fi
+  echo "$fname_tmp"
+}
+
+function _install() {
+  _get_VER
+  fname_tmp=$(_download "$FURL")
+  _setup "$fname_tmp" "/Skim/Skim.app"
+  if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
+}
+
 if [[ ! "$BASH" =~ .*$0.* ]]; then
-  while getopts "h?i" opt; do
+  while getopts "h?if" opt; do
     case "$opt" in
       h|\?) INSTALL=0
       ;;
       i) INSTALL=1
       ;;
+      f) FORCE=1
+      ;;
     esac
   done
   shift $((OPTIND-1))
-
-  if [[ $INSTALL -eq 0 ]]; then
-    _usage
-    exit 0
-  fi
 else
   INSTALL=1
+  FORCE=0
 fi
 
-# install skim.app
-dir_app="/Applications/Skim.app"
-if [ -d  "$dir_app" ]; then
- echo '- Skim already exist.'
-else
-  # get latest Skim download url
-  url_main="https://sourceforge.net"
-  url1="/projects/skim-app/files/Skim/"
-  url="$url_main/$url1"
-  # shellcheck disable=SC1003
-  url=$(curl -s "$url"|
-        grep -e "$url1"|
-        sed 's/\"\//\'$'\n\"\//g'|
-        sed 's/\"/\"\'$'\n/2'|
-        grep '\"\/projects'|head -1)
+if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
+if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 
-  url="${url//\"}" # remove " symbols, curl complains
-  url="${url%?}"
-  fname="${url##*/}" # get filename
-  url="$url_main$url/$fname.dmg/download"
-  url=$( printf "%s\n" "$url" | sed 's/ /%20/g') # replace space by %20
-  fname="$fname.dmg"
-  fname_tmp="/tmp/$fname"
-  if [ ! -f "$fname_tmp" ]; then # if dmg file does not exist
-    echo "* Downloading: $fname"
-    curl -Lo "$fname_tmp" "$url"
-  fi
-
-  hdiutil attach "$fname_tmp" > /dev/null
-  cp -r /Volumes/Skim/Skim.app /Applications/
-  hdiutil detach /Volumes/Skim/ > /dev/null
-  rm "$fname_tmp"
-  echo "* Installed: Skim.app"
-fi
+if [[ $FORCE -eq 0 ]]; then _ver_check; fi
+if [[ $INSTALL -ne 0 ]]; then _install; fi
+echo "$MSG"
 

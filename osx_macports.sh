@@ -76,7 +76,6 @@ gsl         # A numerical library for C and C++ programmers
 texlive     # LaTeX
 git         # A fast version control
 filezilla   # FTP, FTPS and SFTP Client
-meld
 
 python27
 py27-virtualenv         # virtualenv is a tool to create isolated Python
@@ -249,15 +248,16 @@ done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 exports=$(cat <<EOF
 export PATH="/opt/local/bin:/opt/local/sbin:\$PATH" # for ports
 export PATH="/opt/local/libexec/gnubin:\$PATH" # for GNU tools
-export PYTHONPATH=/opt/local/lib/python2.7/site-packages/:\$PYTHONPATH # For Meld
+export PYTHONPATH=/opt/local/lib/python2.7/site-packages/:\$PYTHONPATH # for Meld
 EOF
 )
 for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
   if [ -f "$fl" ]; then
-    fmt="\n##\n%s\n"
+    fmt="\n#\n%s\n"
     note="# Macports OSX Installer addition on "
     # shellcheck disable=SC2059
-    grep -q "$note" "$fl" || printf "$fmt" "$note$(date +'%Y-%m-%d %H:%M:%S')" >> "$fl"
+    grep -q "$note" "$fl" ||
+    printf "$fmt" "$note$(date +'%Y-%m-%d %H:%M:%S')" >> "$fl"
     while read e; do
       grep -q "$e" "$fl" || echo "$e" >> "$fl"
     done <<< "$exports"

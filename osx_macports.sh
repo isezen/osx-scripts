@@ -149,6 +149,7 @@ py27-jupyter
 
 opencv +python27
 vim +python27           # Python Scripting with vim
+MacVim +python27
 EOF
 )
 

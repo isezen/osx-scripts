@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL )"
+# sh -c "$(curl -sL https://git.io/va2oQ)"
 #
 APPNAME="PyCharm"
 DEFAULT_VER="5.0.4"
@@ -20,7 +20,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL )"
+   $ sh -c "\$(curl -sL https://git.io/va2oQ)"
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall

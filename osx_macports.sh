@@ -32,6 +32,9 @@ EOF
 
 # Ports to install
 ports=$(cat <<EOF
+links             # WWW browser with text and graphics modes.
+htop
+openssh +ssh_copy_id
 libGLU
 xorg-server-devel # required for R package: rgl
 glpk              # required for R package: Rglpk

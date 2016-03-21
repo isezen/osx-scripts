@@ -139,7 +139,7 @@ echo "$MSG"
 
 # Predefined Settings
 
-dir_setting=$(Rscript --slave -e "R.home()")
+dir_setting=$(Rscript --slave -e "cat(R.home())")
 dir_setting="$dir_setting/etc"
 mkdir -p "$dir_setting"
 fname="Rprofile.site"

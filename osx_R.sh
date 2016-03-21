@@ -141,6 +141,7 @@ echo "$MSG"
 
 dir_setting=$(Rscript --slave -e "R.home()")
 dir_setting="$dir_setting/etc"
+mkdir -p "$dir_setting"
 fname="Rprofile.site"
 cat <<EOF > "$dir_setting/$fname"
 motd <- "MESSAGE:

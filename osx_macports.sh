@@ -81,6 +81,13 @@ git         # A fast version control
 filezilla   # FTP, FTPS and SFTP Client
 
 python27
+py-pygments
+py-bpython
+bpython_select
+py27-readline
+py27-gnureadline
+py-readline
+py-gnureadline
 py27-virtualenv         # virtualenv is a tool to create isolated Python
 py27-numeric            # Fast and multidimensional array language facility
 py27-re2                # Python wrapper of Google's RE2 library
@@ -148,7 +155,8 @@ py27-pyside
 py27-fiona
 py27-fipy
 py27-pptx               # Create and update PowerPoint files.
-py27-jupyter
+py27-jupyter +qtconsole
+py-jupyter
 
 opencv +python27
 vim +python27           # Python Scripting with vim

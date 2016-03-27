@@ -353,7 +353,7 @@ _install_hack() {
 if [[ "$pkgs" == *"$1"* ]]; then
   installed=$(Rscript --slave -e "cat('$1' %in% installed.packages()[,1])")
   if [[ "$installed" == "FALSE" ]]; then
-CFLAGS="$($1-config --cflags)" LDFLAGS="$($1-config --libs)" Rscript -<<EOF
+CFLAGS="$($2-config --cflags)" LDFLAGS="$($2-config --libs)" Rscript -<<EOF
 lib <- .libPaths()[1]
 if($ALL) lib <- .Library
 install.packages('$1', lib=lib, dependencies = TRUE, quiet=F,
@@ -408,8 +408,8 @@ pkgs="$(echo "$pkgs"|
         sed "s/[^ ][^ ]*/\"&\",/g")"
 pkgs="${pkgs%??}" # remove last two chars
 
-_install_hack gsl
-_install_hack gdal
+_install_hack gsl gsl
+_install_hack rgdal gdal
 
 Rscript -<<EOF
 ip <- function(p){
@@ -454,6 +454,7 @@ EOF
 # sudo CFLAGS="-I/usr/include/gdal" LDFLAGS="-L/usr/lib64 -lgdal" R
 
 # for rgl to work, you have to install XQuartz. http://www.xquartz.org
+# sudo CFLAGS="-I/usr/include/gdal" LDFLAGS="-L/usr/lib64 -lgdal" R
 
 # Base packages
 #  [1] "KernSmooth" "MASS"       "Matrix"     "base"       "boot"

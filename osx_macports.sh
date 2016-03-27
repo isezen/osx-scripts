@@ -36,7 +36,6 @@ links             # WWW browser with text and graphics modes.
 htop
 openssh +ssh_copy_id
 libGLU
-xorg-server-devel # required for R package: rgl
 glpk              # required for R package: Rglpk
 libiconv          # Required for R package: git2r
 openmpi
@@ -69,6 +68,7 @@ grep
 gsed
 getopt
 gnutar
+grc         # Generic Colouriser for colourising logfiles and output
 ImageMagick # Image processing tools
 udunits     # Unit Conversion
 udunits2
@@ -79,6 +79,9 @@ gsl         # A numerical library for C and C++ programmers
 texlive     # LaTeX
 git         # A fast version control
 filezilla   # FTP, FTPS and SFTP Client
+trash       # OSX command line trash support
+macports-notifier
+ncdu
 
 python27
 py-pygments

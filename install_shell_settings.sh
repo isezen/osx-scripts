@@ -21,10 +21,11 @@ function save() {
   echo "Checking if ${SCRIPT} contains aliases..."
   grep "$fnamebase" "${SCRIPT}" > /dev/null 2>&1 || (echo "Appending source command to ${SCRIPT}..."; echo "" >> "${SCRIPT}"; echo "test -e ${QUOTE}${relfname}${QUOTE} ${SHELL_AND} source ${QUOTE}${relfname}${QUOTE}" >> "${SCRIPT}")
   echo "Done."
+  echo ""
 }
 
 SHELL=$(echo "${SHELL}" | tr / "\n" | tail -1)
-URL=""
+# shellcheck disable=SC2016
 HOME_PREFIX='${HOME}'
 SHELL_AND='&&'
 QUOTE=''
@@ -35,12 +36,11 @@ then
   test -f "${HOME}/.bash_profile" && SCRIPT="${HOME}/.bash_profile" || SCRIPT="${HOME}/.profile"
   QUOTE='"'
 else
-  die "Your shell, ${SHELL}, is not supported yet. Only tcsh, zsh, bash, and fish are supported. Sorry!"
+  die "Your shell, ${SHELL}, is not supported yet. Only bash are supported. Sorry!"
   exit 1
 fi
 
 save myaliases "$URL1"
 save mybash "$URL2"
 
-echo ""
 echo "The next time you log in, shell settings will be enabled."

@@ -50,7 +50,7 @@ function _get_FURL() {
       # shellcheck disable=SC2059
       jstmp=$(printf "$js" "$url")
       FURL=$(bash -c "phantomjs <(echo \"$jstmp\")"|
-              grep -oP "https\S*pycharm-$type-[0-9]\.[0-9]\.[0-9]\S*dmg"|
+              grep -oP "https\S*pycharm-$type-\S*dmg"|
               head -1)
     else
       [ $JDK -ne 0 ] && str_jdk="jdk-bundled" || str_jdk=""
@@ -66,7 +66,7 @@ function _get_VER() {
   if [ -z "${VER+x}" ]; then
     VER="$DEFAULT_VER"
     if [ -n "${FURL+x}" ]; then
-      VER=$(echo "$FURL"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+      VER=$(echo "$FURL"|grep -oP '[0-9][0-9][0-9][0-9]\.[0-9]')
     else
       if hash phantomjs 2>/dev/null; then
         # shellcheck disable=SC2059
@@ -74,8 +74,8 @@ function _get_VER() {
         # MAKE SURE PROCESS SUBSTITUTION RUN UNDER BASH
         # PROCESS SUBSTITUTION IS NOT SUPPORTED BY SH.
         VER=$(bash -c "phantomjs <(echo \"$jstmp\")"|
-               grep -oP 'data-code="PCP">[0-9]\.[0-9]\.[0-9]</span>'|
-               grep -oP '[0-9]\.[0-9]\.[0-9]')
+               grep -oP 'data-code="PCP">[0-9][0-9][0-9][0-9]\.[0-9]</span>'|
+               grep -oP '[0-9][0-9][0-9][0-9]\.[0-9]')
       fi
     fi
   fi

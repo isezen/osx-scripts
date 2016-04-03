@@ -82,6 +82,7 @@ filezilla   # FTP, FTPS and SFTP Client
 trash       # OSX command line trash support
 macports-notifier
 ncdu
+p7zip
 
 python27
 py-pygments
@@ -91,6 +92,7 @@ py27-readline
 py27-gnureadline
 py-readline
 py-gnureadline
+py-pylzma
 py27-virtualenv         # virtualenv is a tool to create isolated Python
 py27-numeric            # Fast and multidimensional array language facility
 py27-re2                # Python wrapper of Google's RE2 library

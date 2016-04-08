@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaq3J)"
+# curl -sL https://git.io/vaq3J | bash
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
 APPNAME="R"
@@ -18,7 +18,7 @@ function _usage() {
   USAGE:
    $ $0 -imfh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vaq3J)"
+   $ curl -sL https://git.io/vaq3J | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -m  | --macports : Install by macports
@@ -37,7 +37,7 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL="$URL$(curl -s "$URL"|
-                grep -oP 'R-[0-9]\.[0-9]\.[0-9]\.pkg'|
+                grep -oe 'R-[0-9]\.[0-9]\.[0-9]\.pkg'|
                 head -1)"
   fi
 }
@@ -51,7 +51,7 @@ function _get_VER() {
     else
       var=$(port info R)
     fi
-    VER=$(echo "$var"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+    VER=$(echo "$var"|grep -oe '[0-9]\.[0-9]\.[0-9]')
   fi
 }
 
@@ -61,7 +61,7 @@ function _ver_check() {
     local r_loc
     local cur_ver
     r_loc="$(which R)"
-    cur_ver=$($r_loc --version|grep -oP '[0-9]\.[0-9]\.[0-9]'|head -1)
+    cur_ver=$($r_loc --version|grep -oe '[0-9]\.[0-9]\.[0-9]'|head -1)
 
     if [[ "$VER" == "$cur_ver" ]]; then
       MSG="- $APPNAME: Latest version is installed"

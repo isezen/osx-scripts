@@ -20,7 +20,7 @@ function _usage() {
   USAGE:
    $ $0 -ifyh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vacoq)"
+   $ curl -sL https://git.io/vacoq | bash
   ARGUMENTS:
   -i | --install    : Install $APPNAME
   -f | --force      : Force to install

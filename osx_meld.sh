@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vauql)"
+# curl -sL https://git.io/vauql | bash
 #
 APPNAME="Meld"
 DIR_APP="/Applications/$APPNAME.app"
@@ -16,7 +16,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vauql)"
+   $ curl -sL https://git.io/vauql | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall

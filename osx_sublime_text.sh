@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/v2pDA)"
+# curl -sL https://git.io/vacoq | bash
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
 APPNAME="Sublime Text"

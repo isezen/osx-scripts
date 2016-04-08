@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaJg2)"
+# curl -sL https://git.io/vaJg2 | bash
 #
 APPNAME="Skim"
 DIR_APP="/Applications/$APPNAME.app"
@@ -17,7 +17,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vacoq)"
+   $ curl -sL https://git.io/vaJg2 | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -32,9 +32,9 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     URL="$URL_MAIN/$(curl -s "$URL"|
-           grep -oP '/\S*Skim-[0-9]\.[0-9]\.[0-9][0-9]/'|head -1)"
+           grep -oe '/\S*Skim-[0-9]\.[0-9]\.[0-9][0-9]/'|head -1)"
     FURL=$(curl -s "$URL"|
-          grep -oP 'https\S*Skim-[0-9]\.[0-9]\.[0-9][0-9].dmg')
+          grep -oe 'https\S*Skim-[0-9]\.[0-9]\.[0-9][0-9].dmg')
   fi
 }
 
@@ -42,7 +42,7 @@ function _get_VER() {
   if [ -z "${VER+x}" ]; then
     _get_FURL
     VER=$(echo "$FURL"|
-          grep -oP '[0-9]\.[0-9]\.[0-9][0-9]'|head -1)
+          grep -oe '[0-9]\.[0-9]\.[0-9][0-9]'|head -1)
   fi
 }
 

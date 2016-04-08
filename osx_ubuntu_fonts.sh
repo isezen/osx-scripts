@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaJoi)"
+# curl -sL https://git.io/vaJoi | bash
 # Note: NO need Version Control
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
@@ -18,7 +18,7 @@ function _usage() {
   USAGE:
    $ $0 -ih
   OR
-   $ sh -c "\$(curl -sL https://git.io/vaJoi)"
+   $ curl -sL https://git.io/vaJoi | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -33,7 +33,7 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL=$(curl -s "$URL"|
-           grep -oP '\.\S*ubuntu-font-family-[0-9]\.[0-9][0-9].zip'|
+           grep -oe '\.\S*ubuntu-font-family-[0-9]\.[0-9][0-9].zip'|
            sed -e 's/\.\./http:\/\/font.ubuntu.com/g'|
            sed 's/ /%20/g')
   fi

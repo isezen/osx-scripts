@@ -384,14 +384,14 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL=$(curl -s "$URL"|
-           grep -oP 'https\S*Sublime Text Build [0-9][0-9][0-9][0-9].dmg')
+           grep -oe 'https\S*Sublime Text Build [0-9][0-9][0-9][0-9].dmg')
   fi
 }
 
 function _get_VER() {
   if [ -z "${VER+x}" ]; then
     _get_FURL
-    VER=$(echo "$FURL"|grep -oP '[0-9][0-9][0-9][0-9]')
+    VER=$(echo "$FURL"|grep -oe '[0-9][0-9][0-9][0-9]')
   fi
 }
 

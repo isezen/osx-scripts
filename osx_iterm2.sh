@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaT0V)"
+# curl -sL https://git.io/vaT0V | bash
 #
 APPNAME="iTerm"
 DIR_APP="/Applications/$APPNAME.app"
@@ -16,7 +16,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vacoq)"
+   $ curl -sL https://git.io/vaT0V | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -31,7 +31,7 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL="$(curl -s "$URL"|
-           grep -oP 'https\S*iTerm2-[0-9]_[0-9]_[0-9]\S*zip'|
+           grep -oe 'https\S*iTerm2-[0-9]_[0-9]_[0-9]\S*zip'|
            sort -t_ -rn -k1,1 -k2,2 -k3,3|
            head -1)"
   fi
@@ -41,7 +41,7 @@ function _get_VER() {
   if [ -z "${VER+x}" ]; then
     _get_FURL
     VER=$(echo "$FURL"|
-          grep -oP '[0-9]_[0-9]_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'|
+          grep -oe '[0-9]_[0-9]_[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'|
           sed 's/_/\./g')
   fi
 }

@@ -452,11 +452,11 @@ function _create_symlink() {
   fsubl="$path_bin/subl"
   if [ ! -f "$fsubl" ]; then
     local cmd1="mkdir -p $path_bin"
-    local cmd2="ln -s \"$PATH_SUBL\" $fsubl"
+    local cmd2="ln -s \"$PATH_SUBL\" \"$fsubl\""
     if [[ $EUID -ne 0 ]]; then
       cmd1="sudo $cmd1"; cmd2="sudo $cmd2"
     fi
-    $cmd1 && $cmd2
+    eval $cmd1 && eval $cmd2
     echo "* Created Symlink [$fsubl]"
   else
     echo "- [$fsubl] exist."

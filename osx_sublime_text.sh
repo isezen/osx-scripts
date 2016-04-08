@@ -1,5 +1,5 @@
 #!/bin/bash
-# curl -sL https://git.io/vacoq | bash
+# curl -sL https://git.io/v2pDA | bash
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
 APPNAME="Sublime Text"
@@ -20,7 +20,7 @@ function _usage() {
   USAGE:
    $ $0 -ifyh
   OR
-   $ curl -sL https://git.io/vacoq | bash
+   $ curl -sL https://git.io/v2pDA | bash
   ARGUMENTS:
   -i | --install    : Install $APPNAME
   -f | --force      : Force to install

@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vacoq)"
+# curl -sL https://git.io/vacoq | bash
 #
 APPNAME="Telegram"
 DIR_APP="/Applications/$APPNAME.app"
@@ -16,7 +16,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vacoq)"
+   $ curl -sL https://git.io/vacoq | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -39,7 +39,7 @@ function _get_VER() {
   if [ -z "${VER+x}" ]; then
     VER=$(curl -s "https://desktop.telegram.org"|
           grep -e 'og:description'|
-          grep -oP '[0-9]\.[0-9]\.[0-9][0-9]')
+          grep -oe '[0-9]\.[0-9]\.[0-9][0-9]')
   fi
 }
 

@@ -33,6 +33,7 @@ EOF
 function _predefined_settings() {
   dir_setting="/Users/$USR"
   dir_user="$dir_setting/.rstudio-desktop/monitored/user-settings"
+  mkdir -p "$dir_user"
   fname="user-settings"
   cat <<EOF > "$dir_user/$fname"
   alwaysSaveHistory="1"

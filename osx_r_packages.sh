@@ -417,7 +417,7 @@ ip <- function(p){
   if($ALL) lib <- .Library
   if(!$MP) {
     options(install.packages.check.source = "no")
-    type <- "both"
+    type <- "mac.binary"
   }
   print(getOption("install.packages.check.source"))
   if (lnp){

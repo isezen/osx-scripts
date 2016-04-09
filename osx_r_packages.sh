@@ -413,14 +413,18 @@ ip <- function(p){
   np <- p[!(p %in% installed.packages()[, "Package"])]
   lnp <- length(np)
   lib <- .libPaths()[1]
+  type <- getOption("pkgType")
   if($ALL) lib <- .Library
-  if(!$MP) options(install.packages.check.source = "no")
+  if(!$MP) {
+    options(install.packages.check.source = "no")
+    type <- "both"
+  }
   print(getOption("install.packages.check.source"))
   if (lnp){
     cat("Following", lnp, "packages will be installed:\n")
     cat(np, "\n\n")
     install.packages(np, lib=lib, dependencies = TRUE, quiet=F,
-                     Ncpus=1, repos="https://cran.rstudio.com/")
+                     type = type, Ncpus=1, repos="https://cran.rstudio.com/")
     failed <- np[!(np %in% installed.packages()[, "Package"])]
     n_failed <- length(failed)
     if(n_failed){

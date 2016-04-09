@@ -415,6 +415,7 @@ ip <- function(p){
   lib <- .libPaths()[1]
   if($ALL) lib <- .Library
   if(!$MP) options(install.packages.check.source = "no")
+  print(getOption("install.packages.check.source"))
   if (lnp){
     cat("Following", lnp, "packages will be installed:\n")
     cat(np, "\n\n")

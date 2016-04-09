@@ -1,5 +1,5 @@
 #!/bin/bash
-# curl -sL https://git.io/vaWJa | bash
+# curl -sL https://git.io/vaWJa | sudo bash
 #
 APPNAME="XQuartz"
 DIR_APP="/Applications/Utilities/$APPNAME.app"
@@ -17,7 +17,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ curl -sL https://git.io/vaWJa | bash
+   $ curl -sL https://git.io/vaWJa | sudo bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall

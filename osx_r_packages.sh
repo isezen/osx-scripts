@@ -30,7 +30,6 @@ function _usage() {
 EOF
 }
 
-function _predefined_packages() {
 # Install R packages
 rpkgs=$(cat <<EOF
 abind           # Combine multidimensional arrays into a single array
@@ -347,7 +346,6 @@ yaml            # This package implements the libyaml YAML 1.1 parser and emitte
 zoo             # An S3 class with methods for totally ordered indexed
 EOF
 )
-}
 
 _install_hack() {
 if [[ "$pkgs" == *"$1"* ]]; then
@@ -397,7 +395,6 @@ if [[ $r_exist -eq 0 ]]; then
   echo "Please, install R."
 fi
 
-_predefined_packages
 # shellcheck disable=SC2001
 pkgs=$(echo "$rpkgs" | sed -e 's/#.*$//')
 pkgs=$(echo "$pkgs" | uniq) # remove duplicate entries and sort

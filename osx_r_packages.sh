@@ -447,6 +447,11 @@ invisible(pkgs <- c($pkgs))
 ip(pkgs)
 EOF
 
+# install packages that are not in repositories
+Rscript -<<EOF
+devtools::install_github("jalvesaq/colorout")
+EOF
+
 # for gsl package
 # http://stackoverflow.com/questions/24781125/installing-r-gsl-package-on-mac
 # gsl-config --libs

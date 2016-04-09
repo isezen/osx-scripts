@@ -375,24 +375,21 @@ if [[ ! "$BASH" =~ .*$0.* ]]; then
   shift $((OPTIND-1))
 else
   INSTALL=1
-  ALL=1
 fi
 
 if [[ $INSTALL -eq 0 ]]; then _usage;exit; fi
 if [[ "$OSTYPE" != "darwin"* ]]; then echo "$ONLYMAC";exit; fi
 
-
 # Check if R was installed
-r_exist=0
-for fl in /usr/bin/R /opt/local/bin/R; do
-  if [ -f  $fl ]; then
-    r_exist=1
-    break
-  fi
-done
-
-if [[ $r_exist -eq 0 ]]; then
+if ! hash R 2>/dev/null; then
   echo "Please, install R."
+fi
+
+# get R location
+if [[ "$(which R)" == "/opt/local/bin/R" ]]; then
+  if hash port 2>/dev/null; then
+    MP=1
+  fi
 fi
 
 # shellcheck disable=SC2001
@@ -405,8 +402,11 @@ pkgs="$(echo "$pkgs"|
         sed "s/[^ ][^ ]*/\"&\",/g")"
 pkgs="${pkgs%??}" # remove last two chars
 
-_install_hack gsl gsl
-_install_hack rgdal gdal
+# if macports R is installed, use install hack
+if [[ $MP -eq 1 ]]; then
+  _install_hack gsl gsl
+  _install_hack rgdal gdal
+fi
 
 Rscript -<<EOF
 ip <- function(p){

@@ -59,23 +59,23 @@ host <- as.character(Sys.info()["nodename"])
 host <- gsub(".local", "", host)
 if (mark != "") mark <- paste0("[", mark, "]:")
 rver <- paste(R.Version()$major,R.Version()$minor, sep=".")
-prmt <- "R> "
+prmt <- "R>"
 
 if(Sys.getenv("TERM") == "xterm-256color"){
   suppressMessages(suppressWarnings(require("colorout")))
   mark <- paste0("[36m", mark, "[35m",user, "[91m@[0m", host)
   motd <- paste0("[35m", motd, "[0m")
-  prmt <- paste0("[36m", prmt)
+  # prmt <- paste0("[36m", prmt, "[0m ")
 }else{
   mark <- paste0(mark, user, "@", host)
 }
-options(prompt=prmt)
+options(prompt=paste0(prmt, " "))
 options(stringsAsFactors=FALSE)
 
 .First <- function(){
   if(interactive()){
     library(utils)
-    library(lintr)
+    suppressMessages(suppressWarnings(require("lintr")))
     cls()
     cat(mark,"\n", sep="")
     timestamp(stamp=Sys.time(),

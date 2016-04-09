@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaCty)"
+# curl -sL https://git.io/vaCty | bash
 #
 APPNAME="R Packages"
 ONLYMAC="This script is ONLY for MAC OSX."
@@ -18,7 +18,7 @@ function _usage() {
   USAGE:
    $ $0 -imfh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vaCty)"
+   $ curl -sL https://git.io/vaCty | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -a | --all     : for All users

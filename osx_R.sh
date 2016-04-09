@@ -139,92 +139,10 @@ echo "$MSG"
 
 # Predefined Settings
 
-dir_setting=$(Rscript --slave -e "cat(R.home())")
-dir_setting="$dir_setting/etc"
-mkdir -p "$dir_setting"
+dir_setting=$(Rscript --slave -e "cat(R.home())")/etc
 fname="Rprofile.site"
-cat <<EOF > "$dir_setting/$fname"
-motd <- "MESSAGE:
-You can install your own packages. Nevertheless, contact admins
-and ask to install for all users. Hence, everyone can benefit
-and run your code without installing seperately."
-mark <- "CareITU"
-
-local({
-  r <- getOption("repos")
-  r["CRAN"] <- "https://cran.rstudio.com/"
-  options(repos=r)
-}
-)
-utils::rc.settings(ipck=TRUE)
-e <- baseenv()
-unlockBinding("q", e)
-q <- function (save="no", ...) { quit(save=save, ...) }
-exit <- q
-lockBinding("q", e)
-cls <- function() {
-  if(.Platform$GUI[1] == "Rgui"){
-    if(!require(rcom, quietly = TRUE)) # Not shown any way!
-      stop("Package rcom is required for 'cls()'")
-    wsh <- comCreateObject("Wscript.Shell")
-    if(is.null(wsh)){
-      return(invisible(FALSE))
-    }else{
-      comInvoke(wsh, "SendKeys", "\014")
-      return(invisible(TRUE))
-    }
-  }else{
-    term <- Sys.getenv("TERM")
-    if(term == "") {
-      cat("\014")
-      return(invisible(TRUE))
-    }
-    else if(term == "xterm-256color"){
-      system("clear")
-      return(invisible(TRUE))
-    }else{
-      return(invisible(FALSE))
-    }
-  }
-}
-
-user <- as.character(Sys.info()["user"])
-host <- as.character(Sys.info()["nodename"])
-host <- gsub(".local", "", host)
-if (mark != "") mark <- paste0("[", mark, "]:")
-rver <- paste(R.Version()\$major,R.Version()\$minor, sep=".")
-prmt <- "R> "
-
-if(Sys.getenv("TERM") == "xterm-256color"){
-  suppressMessages(suppressWarnings(require("colorout")))
-  mark <- paste0("[36m", mark, "[35m",user, "[91m@[0m", host)
-  motd <- paste0("[35m", motd, "[0m")
-}else{
-  mark <- paste0(mark, user, "@", host)
-}
-options(prompt=prmt)
-options(stringsAsFactors=FALSE)
-
-.First <- function(){
-  if(interactive()){
-    library(utils)
-    library(lintr)
-    cls()
-    cat(mark,"\n", sep="")
-    timestamp(stamp=Sys.time(),
-              prefix=paste("#--[R ", rver,"]---[",getwd(),"] ",sep=""),
-              suffix="--#")
-    if(motd != "") cat(motd, "\n")
-  }
-}
-
-.Last <- function(){
-  if(interactive()){
-    hist_file <- Sys.getenv("R_HISTFILE")
-    if (hist_file == "") hist_file <- "~/.RHistory"
-    savehistory(hist_file)
-  }
-}
-
-EOF
-echo "* Created $dir_setting/$fname"
+mkdir -p "$dir_setting"
+sudo curl -# -o "$dir_setting/$fname" "https://raw.githubusercontent.com/isezen/osx-scripts/master/settings/Rprofile.site"
+if [ $? -eq 0 ]; then
+  echo "* Created $dir_setting/$fname"
+fi

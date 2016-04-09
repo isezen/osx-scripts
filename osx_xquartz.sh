@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaWJa)"
+# curl -sL https://git.io/vaWJa | bash
 #
 APPNAME="XQuartz"
 DIR_APP="/Applications/Utilities/$APPNAME.app"
@@ -17,7 +17,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vaWJa)"
+   $ curl -sL https://git.io/vaWJa | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -32,14 +32,14 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL=$(curl -s "$URL"|
-           grep -oP 'https\S*XQuartz-[0-9]\.[0-9]\.[0-9].dmg')
+           grep -oe 'https\S*XQuartz-[0-9]\.[0-9]\.[0-9].dmg')
   fi
 }
 
 function _get_VER() {
   if [ -z "${VER+x}" ]; then
     _get_FURL
-    VER=$(echo "$FURL"|grep -oP '[0-9]\.[0-9]\.[0-9]')
+    VER=$(echo "$FURL"|grep -oe '[0-9]\.[0-9]\.[0-9]')
   fi
 }
 

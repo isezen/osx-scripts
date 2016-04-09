@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/vaTdJ)"
+# curl -sL https://git.io/vaTdJ | bash
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
 APPNAME="RStudio"
@@ -17,7 +17,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/vacoq)"
+   $ curl -sL https://git.io/vaTdJ | bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -74,7 +74,7 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL="$(curl -s "$URL"|
-            grep -oP 'https\S*RStudio-[0-9]\.[0-9][0-9]\.[0-9][0-9][0-9]\S*dmg')"
+            grep -oe 'https\S*RStudio-[0-9]\.[0-9][0-9]\.[0-9][0-9][0-9]\S*dmg')"
   fi
 }
 
@@ -82,7 +82,7 @@ function _get_VER() {
   if [ -z "${VER+x}" ]; then
     _get_FURL
     VER=$(echo "$FURL"|
-          grep -oP '[0-9]\.[0-9][0-9]\.[0-9][0-9][0-9]')
+          grep -oe '[0-9]\.[0-9][0-9]\.[0-9][0-9][0-9]')
   fi
 }
 

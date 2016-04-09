@@ -250,16 +250,6 @@ if [[ $FORCE -eq 0 ]]; then _ver_check; fi
 if [[ $INSTALL -ne 0 ]]; then _install; fi
 echo "$MSG"
 
-while read p; do
-  # shellcheck disable=SC2086
-  var=$(port installed $p)
-  if [[ $var =~ .*None.* ]]; then
-    # shellcheck disable=SC2086
-    port install $p
-    echo
-  fi
-done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
-
 # Add export statement into bash_profile
 exports=$(cat <<EOF
 export PATH="/opt/local/bin:/opt/local/sbin:\$PATH" # for ports
@@ -280,6 +270,20 @@ for fl in ~/.bash_profile ~/.bash_login ~/.profile; do
     break
   fi
 done
+
+source "$fl"
+
+while read p; do
+  # shellcheck disable=SC2086
+  var=$(port installed $p)
+  if [[ $var =~ .*None.* ]]; then
+    # shellcheck disable=SC2086
+    port install $p
+    echo
+  fi
+done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
+
+
 
 # Other settings
 echo

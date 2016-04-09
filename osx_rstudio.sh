@@ -133,7 +133,7 @@ function _download() {
 function _install() {
   _get_VER
   fname_tmp=$(_download "$FURL")
-  fname=${url##*/} # get filename
+  fname=${FURL##*/} # get filename
   _setup "$fname_tmp" "/${fname%.dmg}/RStudio.app"
   if [ -z "${MSG+x}" ]; then MSG="* Installed : $APPNAME v$VER"; fi
 }

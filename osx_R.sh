@@ -1,5 +1,5 @@
 #!/bin/bash
-# curl -sL https://git.io/vaq3J | bash
+# curl -sL https://git.io/vaq3J | sudo bash
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
 APPNAME="R"
@@ -18,7 +18,7 @@ function _usage() {
   USAGE:
    $ $0 -imfh
   OR
-   $ curl -sL https://git.io/vaq3J | bash
+   $ curl -sL https://git.io/vaq3J | sudo bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -m  | --macports : Install by macports

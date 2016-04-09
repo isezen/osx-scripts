@@ -1,5 +1,5 @@
 #!/bin/bash
-# sh -c "$(curl -sL https://git.io/v2pMc)"
+# curl -sL https://git.io/v2pMc | sudo bash
 #
 [[ -z "$SUDO_USER" ]] && USR=$USER || USR=$SUDO_USER
 APPNAME="Macports"
@@ -17,7 +17,7 @@ function _usage() {
   USAGE:
    $ $0 -ifh
   OR
-   $ sh -c "\$(curl -sL https://git.io/v2pMc)"
+   $ curl -sL https://git.io/v2pMc | sudo bash
   ARGUMENTS:
   -i | --install : Install $APPNAME
   -f | --force   : Force to reinstall
@@ -162,7 +162,6 @@ py27-fipy
 py27-pptx               # Create and update PowerPoint files.
 py27-jupyter +qtconsole
 py-jupyter
-
 opencv +python27
 vim +python27           # Python Scripting with vim
 MacVim +python27
@@ -172,7 +171,7 @@ EOF
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
     FURL="$(curl -s "$URL"|
-                grep -oP 'https\S*MacPorts-[0-9]\.[0-9]\.[0-9]\S*pkg'|
+                grep -oe 'https\S*MacPorts-[0-9]\.[0-9]\.[0-9]\S*pkg'|
                 head -1)"
   fi
 }
@@ -181,7 +180,7 @@ function _get_VER() {
   if [ -z "${VER+x}" ]; then
     _get_FURL
     VER=$(echo "$FURL"|
-          grep -oP '[0-9]\.[0-9]\.[0-9]')
+          grep -oe '[0-9]\.[0-9]\.[0-9]')
   fi
 }
 

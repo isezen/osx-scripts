@@ -419,7 +419,6 @@ ip <- function(p){
     options(install.packages.check.source = "no")
     type <- "mac.binary"
   }
-  print(getOption("install.packages.check.source"))
   if (lnp){
     cat("Following", lnp, "packages will be installed:\n")
     cat(np, "\n\n")

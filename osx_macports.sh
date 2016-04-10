@@ -83,6 +83,7 @@ trash       # OSX command line trash support
 macports-notifier
 ncdu
 p7zip
+fish       # command line shell
 
 python27
 py-pygments

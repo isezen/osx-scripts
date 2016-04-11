@@ -332,6 +332,7 @@ tripack
 truncdist
 trust           # local optimization using two derivatives and trust regions. Guaranteed to converge to local minimum of objective function
 tseries
+TTR             # Moving Average
 vcd
 vegan
 VIM

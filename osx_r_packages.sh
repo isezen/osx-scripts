@@ -438,7 +438,7 @@ ip <- function(p){
   op <- old.packages(lib.loc=lib, repos="https://cran.rstudio.com/")
   if(!is.null(op)){
     cat("* Following pacakges will be updated:\n")
-    print(op[,c(1,3,5)])
+    print(op[,c(3,5)])
     update.packages(lib.loc=lib, repos="https://cran.rstudio.com/", ask=F, type = type)
   }else{
     cat("- All predefined packages have alredy been installed and up-to-date.\n")

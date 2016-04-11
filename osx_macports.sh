@@ -93,6 +93,7 @@ py27-readline
 py27-gnureadline
 py-readline
 py-gnureadline
+py-pytest
 py-pylzma
 py27-virtualenv         # virtualenv is a tool to create isolated Python
 py27-numeric            # Fast and multidimensional array language facility
@@ -284,7 +285,10 @@ while read p; do
   fi
 done <<< "$(echo "$ports" | sed -e 's/#.*$//' | sed -e '/^$/d')"
 
-
+# # set fish as default shell
+# fish_path="$(which fish)"
+# echo "$fish_path" >> /etc/shells
+# chsh -s "$fish_path"
 
 # Other settings
 echo
@@ -293,6 +297,7 @@ port select --set python2 python27
 port select --set cython cython27
 port select --set ipython py27-ipython
 port select --set ipython2 py27-ipython
+port select --set bpython bpython27
 port select --set sphinx py27-sphinx
 port select --set py-cairosvg py27-cairosvg
 port select --set pep8 pep8-27

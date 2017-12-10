@@ -2,7 +2,8 @@ motd <- "MESSAGE:
 You can install your own packages. Nevertheless, contact admins
 and ask to install for all users. Hence, everyone can benefit
 and run your code without installing seperately."
-mark <- "CareITU"
+motd <- ""
+mark <- ""
 
 local({
   r <- getOption("repos")
@@ -39,7 +40,11 @@ cls <- function() {
       comInvoke(wsh, "SendKeys", "\014")
       return(invisible(TRUE))
     }
+  }else if(.Platform$GUI[1] == "RStudio") {
+      cat("\014")
+      return(invisible(TRUE))
   }else{
+    cat("\014")
     term <- Sys.getenv("TERM")
     if(term == "") {
       cat("\014")
@@ -62,7 +67,6 @@ rver <- paste(R.Version()$major,R.Version()$minor, sep=".")
 prmt <- "R>"
 
 if(Sys.getenv("TERM") == "xterm-256color"){
-  suppressMessages(suppressWarnings(require("colorout")))
   mark <- paste0("[36m", mark, "[35m",user, "[91m@[0m", host)
   motd <- paste0("[35m", motd, "[0m")
   # prmt <- paste0("[36m", prmt, "[0m ")
@@ -79,9 +83,10 @@ options(stringsAsFactors=FALSE)
     cls()
     cat(mark,"\n", sep="")
     timestamp(stamp=Sys.time(),
-              prefix=paste("#--[R ", rver,"]---[",getwd(),"] ",sep=""),
-              suffix="--#")
+              prefix=paste("#--[[95mR [36m", rver,"[0m]---[[93m",getwd(),"[0m] [94m",sep=""),
+              suffix="[0m--#")
     if(motd != "") cat(motd, "\n")
+    suppressMessages(suppressWarnings(library("colorout")))
   }
 }
 

@@ -12,6 +12,16 @@ local({
   options("device" = "quartz")
 }
 )
+
+imgcat <- function(x, ...){
+    path <- tempfile(fileext = '.png')
+    png(path, ...)
+    x
+    dev.off()
+    system(paste('~/.iterm2/imgcat', path))
+    file.remove(path)
+}
+
 utils::rc.settings(ipck=TRUE)
 e <- baseenv()
 unlockBinding("q", e)
@@ -64,7 +74,7 @@ host <- as.character(Sys.info()["nodename"])
 host <- gsub(".local", "", host)
 if (mark != "") mark <- paste0("[", mark, "]:")
 rver <- paste(R.Version()$major,R.Version()$minor, sep=".")
-prmt <- "R>"
+prmt <- ">"
 
 if(Sys.getenv("TERM") == "xterm-256color"){
   mark <- paste0("[36m", mark, "[35m",user, "[91m@[0m", host)
@@ -82,18 +92,21 @@ options(stringsAsFactors=FALSE)
     suppressMessages(suppressWarnings(require("lintr")))
     cls()
     cat(mark,"\n", sep="")
+    cat(paste("#--[[95mR [36m", rver,"[0m]---[[93m",getwd(),
+              "[0m] [94m", Sys.time(), "[0m--#", sep=""))
     timestamp(stamp=Sys.time(),
-              prefix=paste("#--[[95mR [36m", rver,"[0m]---[[93m",getwd(),"[0m] [94m",sep=""),
-              suffix="[0m--#")
+              prefix=paste("#--R ", rver,"]---[",getwd(),"]",sep=""),
+              suffix="--#", quiet = TRUE)
     if(motd != "") cat(motd, "\n")
     suppressMessages(suppressWarnings(library("colorout")))
+    # loadhistory()
   }
 }
 
 .Last <- function(){
   if(interactive()){
     hist_file <- Sys.getenv("R_HISTFILE")
-    if (hist_file == "") hist_file <- "~/.RHistory"
+    if (hist_file == "") hist_file <- "~/.Rhistory"
     savehistory(hist_file)
   }
 }

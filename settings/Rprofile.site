@@ -95,7 +95,7 @@ options(stringsAsFactors=FALSE)
     cat(paste("#--[[95mR [36m", rver,"[0m]---[[93m",getwd(),
               "[0m] [94m", Sys.time(), "[0m--#", sep=""))
     timestamp(stamp=Sys.time(),
-              prefix=paste("#--R ", rver,"]---[",getwd(),"]",sep=""),
+              prefix=paste("#--[R ", rver,"]---[",getwd(),"]",sep=""),
               suffix="--#", quiet = TRUE)
     if(motd != "") cat(motd, "\n")
     suppressMessages(suppressWarnings(library("colorout")))

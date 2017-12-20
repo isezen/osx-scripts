@@ -4,14 +4,14 @@
 APPNAME="Meld"
 DIR_APP="/Applications/$APPNAME.app"
 ONLYMAC="This script is ONLY for MAC OSX."
-URL="https://github.com/yousseb/meld/releases/tag/osx-v1"
+URL="https://github.com/yousseb/meld/releases/tag/osx-10"
 INSTALL=0
 FORCE=0
 
 function _usage() {
   cat<<EOF
-  $APPNAME OSX Installer Script v16.03.16
-  Ismail SEZEN sezenismail@gmail.com 2016
+  $APPNAME OSX Installer Script v17.12.20
+  Ismail SEZEN sezenismail@gmail.com 2017
   WARNING: ONLY FOR OSX
   USAGE:
    $ $0 -ifh
@@ -30,7 +30,7 @@ EOF
 
 function _get_FURL() {
   if [ -z "${FURL+x}" ]; then
-    FURL="https://github.com/yousseb/meld/releases/download/osx-v1/meldmerge.dmg"
+    FURL="https://github.com/yousseb/meld/releases/download/osx-10/meldmerge.dmg"
   fi
 }
 

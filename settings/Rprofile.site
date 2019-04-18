@@ -5,6 +5,8 @@ and run your code without installing seperately."
 motd <- ""
 mark <- ""
 
+options(Ncpus = max(parallel::detectCores(), 1))
+
 local({
   r <- getOption("repos")
   r["CRAN"] <- "https://cran.rstudio.com/"

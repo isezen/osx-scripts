@@ -453,6 +453,9 @@ Rscript -<<EOF
 devtools::install_github("jalvesaq/colorout")
 EOF
 
+# for sf
+# https://github.com/r-spatial/sf/issues/335
+#
 # for gsl package
 # http://stackoverflow.com/questions/24781125/installing-r-gsl-package-on-mac
 # gsl-config --libs

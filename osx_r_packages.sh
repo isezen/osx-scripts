@@ -461,6 +461,7 @@ EOF
 # sudo CFLAGS="-I/usr/include/gdal" LDFLAGS="-L/usr/lib64 -lgdal" R
 
 # for rgl to work, you have to install XQuartz. http://www.xquartz.org
+# install.packages("rgl", configure.args = "--x-includes=/opt/X11/include/X11/ --x-libraries=/opt/X11/lib/X11/")
 # sudo CFLAGS="-I/usr/include/gdal" LDFLAGS="-L/usr/lib64 -lgdal" R
 
 # Base packages

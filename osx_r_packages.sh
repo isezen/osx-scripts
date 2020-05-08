@@ -453,6 +453,9 @@ Rscript -<<EOF
 devtools::install_github("jalvesaq/colorout")
 EOF
 
+# for sf
+# https://github.com/r-spatial/sf/issues/335
+#
 # for gsl package
 # http://stackoverflow.com/questions/24781125/installing-r-gsl-package-on-mac
 # gsl-config --libs
@@ -461,6 +464,7 @@ EOF
 # sudo CFLAGS="-I/usr/include/gdal" LDFLAGS="-L/usr/lib64 -lgdal" R
 
 # for rgl to work, you have to install XQuartz. http://www.xquartz.org
+# install.packages("rgl", configure.args = "--x-includes=/opt/X11/include/X11/ --x-libraries=/opt/X11/lib/X11/")
 # sudo CFLAGS="-I/usr/include/gdal" LDFLAGS="-L/usr/lib64 -lgdal" R
 
 # Base packages

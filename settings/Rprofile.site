@@ -1,114 +1,165 @@
-motd <- "MESSAGE:
-You can install your own packages. Nevertheless, contact admins
-and ask to install for all users. Hence, everyone can benefit
-and run your code without installing seperately."
-motd <- ""
-mark <- ""
-
-options(Ncpus = max(parallel::detectCores(), 1))
-
 local({
+  .motd <- "MESSAGE:
+  You can install your own packages. Nevertheless, contact admins
+  and ask to install for all users. Hence, everyone can benefit
+  and run your code without installing seperately."
+  .motd <- ""
+  .mark <- ""
+
   r <- getOption("repos")
   r["CRAN"] <- "https://cran.rstudio.com/"
-  options(repos=r)
+  options(repos = r)
   options("device" = "quartz")
-}
-)
+  options(stringsAsFactors = FALSE)
+  options(Ncpus = max(parallel::detectCores(), 1))
 
-imgcat <- function(x, ...){
-    path <- tempfile(fileext = '.png')
-    png(path, ...)
-    x
-    dev.off()
-    system(paste('~/.iterm2/imgcat', path))
-    file.remove(path)
-}
+  if (interactive()) {
+    user <- as.character(Sys.info()["user"])
+    host <- as.character(Sys.info()["nodename"])
+    host <- gsub(".local", "", host)
+    if (.mark != "") .mark <- paste0("[", .mark, "]:")
+    rver <- paste(R.Version()$major, R.Version()$minor, sep = ".")
+    prmt <- ">"
+    if (Sys.getenv("TERM") == "xterm-256color") {
+      .mark <- paste0("[36m", .mark, "[35m", user,
+                      "[91m@[0m", host)
+      .motd <- paste0("[35m", .motd, "[0m")
+      # prmt <- paste0("[36m", prmt, "[0m ")
+    } else {
+      .mark <- paste0(.mark, user, "@", host)
+    }
+    options(prompt = paste0(prmt, " "))
+    options(.mark = .mark, .motd = .motd)
+  }
+})
 
-utils::rc.settings(ipck=TRUE)
-e <- baseenv()
-unlockBinding("q", e)
-q <- function (save="no", ...) { quit(save=save, ...) }
-exit <- q
-lockBinding("q", e)
+utils::rc.settings(ipck = TRUE)
+unlockBinding("q", baseenv())
+q <- function(save = "no", ...) quit(save = save, ...)
+exit <- function(save = "yes", ...) quit(save = save, ...)
+lockBinding("q", baseenv())
+
 len <- base::length
 s   <- base::summary
 h   <- utils::head
 n   <- base::names
 cd  <- base::setwd
 pwd <- base::getwd
+
+if (suppressMessages(suppressWarnings(require(microbenchmark))))
+  mb <- microbenchmark::microbenchmark
+
 lsv <- function(name = parent.frame()) {
     obj <- ls(name = name)
     obj[!sapply(obj, function(x) is.function(get(x)))]
 }
-cle <- function(){rm(list=ls(envir=globalenv()))}
+
+cle <- function() rm(list = ls(envir = globalenv()))
+
 cls <- function() {
-  if(.Platform$GUI[1] == "Rgui"){
-    if(!require(rcom, quietly = TRUE)) # Not shown any way!
+  if (.Platform$GUI[1] == "Rgui") {
+    if (!require(rcom, quietly = TRUE))
       stop("Package rcom is required for 'cls()'")
     wsh <- comCreateObject("Wscript.Shell")
-    if(is.null(wsh)){
+    if (is.null(wsh)) {
       return(invisible(FALSE))
-    }else{
+    } else {
       comInvoke(wsh, "SendKeys", "\014")
       return(invisible(TRUE))
     }
-  }else if(.Platform$GUI[1] == "RStudio") {
+  }else if (.Platform$GUI[1] == "RStudio") {
       cat("\014")
       return(invisible(TRUE))
-  }else{
+  } else {
     cat("\014")
     term <- Sys.getenv("TERM")
-    if(term == "") {
+    if (term == "") {
       cat("\014")
       return(invisible(TRUE))
     }
-    else if(term == "xterm-256color"){
+    else if (term == "xterm-256color") {
       system("clear")
       return(invisible(TRUE))
-    }else{
+    } else {
       return(invisible(FALSE))
     }
   }
 }
 
-user <- as.character(Sys.info()["user"])
-host <- as.character(Sys.info()["nodename"])
-host <- gsub(".local", "", host)
-if (mark != "") mark <- paste0("[", mark, "]:")
-rver <- paste(R.Version()$major,R.Version()$minor, sep=".")
-prmt <- ">"
-
-if(Sys.getenv("TERM") == "xterm-256color"){
-  mark <- paste0("[36m", mark, "[35m",user, "[91m@[0m", host)
-  motd <- paste0("[35m", motd, "[0m")
-  # prmt <- paste0("[36m", prmt, "[0m ")
-}else{
-  mark <- paste0(mark, user, "@", host)
-}
-options(prompt=paste0(prmt, " "))
-options(stringsAsFactors=FALSE)
-
-.First <- function(){
-  if(interactive()){
-    library(utils)
-    suppressMessages(suppressWarnings(require("lintr")))
-    cls()
-    cat(mark,"\n", sep="")
-    cat(paste("#--[[95mR [36m", rver,"[0m]---[[93m",getwd(),
-              "[0m] [94m", Sys.time(), "[0m--#", sep=""))
-    timestamp(stamp=Sys.time(),
-              prefix=paste("#--[R ", rver,"]---[",getwd(),"]",sep=""),
-              suffix="--#", quiet = TRUE)
-    if(motd != "") cat(motd, "\n")
-    suppressMessages(suppressWarnings(library("colorout")))
-    # loadhistory()
+if (is.na(Sys.getenv("RSTUDIO", unset = NA))) {
+  icat <- function(x, ...) {
+    plt <- .Platform$GUI[1]
+    if (interactive() & plt == "X11") {
+      path <- tempfile(fileext = ".png")
+      png(path, ...)
+      x
+      dev.off()
+      system(paste("~/.iterm2/imgcat", path))
+      file.remove(path)
+    } else message("icat disabled in ", plt)
   }
 }
 
-.Last <- function(){
-  if(interactive()){
+sh <- function() {
+  if (interactive()) {
+    hist_file <- Sys.getenv("R_HISTFILE")
+    if (hist_file == "") {
+      hist_file <- ".Rhistory"
+      if (!file.exists(hist_file)) hist_file <- paste0("~/", hist_file)
+    }
+    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) utils::savehistory(hist_file)
+  }
+}
+
+restart <- function() {
+  if (interactive()) {
+    if (.Platform$GUI[1] == "Rgui") {
+    shell("Rgui"); q("no")
+    } else if (.Platform$GUI[1] == "RStudio") {
+      sh()
+      .rs.restartR()
+    } else {
+      if (!nzchar(Sys.getenv("RADIAN_VERSION"))) {
+        system("R"); q("no")
+      }
+    }
+  }
+  invisible(NULL)
+}
+
+.First <- function() {
+  if (interactive()) {
+    cls()
+    .mark <- getOption(".mark")
+    .motd <- getOption(".motd")
+    rver <- paste(R.Version()$major, R.Version()$minor, sep = ".")
+    cat(.mark, "\n", sep = "")
+    cat(paste("#--[[95mR [36m", rver, "[0m]---[[93m",
+              getwd(), "[0m] [94m", Sys.time(), "[0m--#",
+              sep = ""))
+    utils::timestamp(
+      stamp = Sys.time(),
+      prefix = paste("#--[R ", rver, "]---[", getwd(), "]", sep = ""),
+      suffix = "--#", quiet = TRUE)
+    if (.motd != "") cat(.motd, "\n")
+    options(.mark = NULL, .motd = NULL)
+
+    hist_file <- Sys.getenv("R_HISTFILE")
+    if (hist_file == "") {
+      hist_file <- ".Rhistory"
+      if (!file.exists(hist_file)) hist_file <- paste0("~/", hist_file)
+    }
+    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) utils::loadhistory(hist_file)
+
+    suppressMessages(suppressWarnings(require("lintr")))
+    suppressMessages(suppressWarnings(library("colorout")))
+  }
+}
+
+.Last <- function() {
+  if (interactive()) {
     hist_file <- Sys.getenv("R_HISTFILE")
     if (hist_file == "") hist_file <- "~/.Rhistory"
-    savehistory(hist_file)
+    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) utils::savehistory(hist_file)
   }
 }

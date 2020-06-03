@@ -100,7 +100,9 @@ if (is.na(Sys.getenv("RSTUDIO", unset = NA))) {
   }
 }
 
+# Save history
 sh <- function() {
+if (!is.na(Sys.getenv("RSTUDIO", unset = NA))) return(invisible(NULL))
   if (interactive()) {
     hist_file <- Sys.getenv("R_HISTFILE")
     if (hist_file == "") {
@@ -108,6 +110,22 @@ sh <- function() {
       if (!file.exists(hist_file)) hist_file <- paste0("~/", hist_file)
     }
     if (!nzchar(Sys.getenv("RADIAN_VERSION"))) utils::savehistory(hist_file)
+    message("History saved: ", hist_file)
+  }
+}
+
+# Load history
+lh <- function() {
+  if (is.na(Sys.getenv("RSTUDIO", unset = NA))) {
+    hist_file <- Sys.getenv("R_HISTFILE")
+    if (hist_file == "") {
+      hist_file <- ".Rhistory"
+      if (!file.exists(hist_file)) hist_file <- paste0("~/", hist_file)
+    }
+    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) {
+      utils::loadhistory(hist_file)
+      message("History loaded: ", hist_file)
+    }
   }
 }
 
@@ -143,23 +161,12 @@ restart <- function() {
       suffix = "--#", quiet = TRUE)
     if (.motd != "") cat(.motd, "\n")
     options(.mark = NULL, .motd = NULL)
-
-    hist_file <- Sys.getenv("R_HISTFILE")
-    if (hist_file == "") {
-      hist_file <- ".Rhistory"
-      if (!file.exists(hist_file)) hist_file <- paste0("~/", hist_file)
-    }
-    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) utils::loadhistory(hist_file)
-
+    lh()
     suppressMessages(suppressWarnings(require("lintr")))
-    suppressMessages(suppressWarnings(library("colorout")))
+    suppressMessages(suppressWarnings(require("colorout")))
   }
 }
 
 .Last <- function() {
-  if (interactive()) {
-    hist_file <- Sys.getenv("R_HISTFILE")
-    if (hist_file == "") hist_file <- "~/.Rhistory"
-    if (!nzchar(Sys.getenv("RADIAN_VERSION"))) utils::savehistory(hist_file)
-  }
+  sh()
 }

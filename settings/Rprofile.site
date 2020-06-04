@@ -164,6 +164,8 @@ restart <- function() {
     lh()
     suppressMessages(suppressWarnings(require("lintr")))
     suppressMessages(suppressWarnings(require("colorout")))
+    if ("prettycode" %in% rownames(utils::installed.packages()))
+      suppressMessages(prettycode::prettycode())
   }
 }
 

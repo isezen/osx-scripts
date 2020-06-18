@@ -9,7 +9,7 @@ local({
   r <- getOption("repos")
   r["CRAN"] <- "https://cran.rstudio.com/"
   options(repos = r)
-  options("device" = "quartz")
+  # options("device" = "quartz")
   options(stringsAsFactors = FALSE)
   options(Ncpus = max(parallel::detectCores(), 1))
 

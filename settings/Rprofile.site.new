@@ -1,0 +1,68 @@
+local({
+  .motd <- "MESSAGE:
+  You can install your own packages. Nevertheless, contact admins
+  and ask to install for all users. Hence, everyone can benefit
+  and run your code without installing seperately."
+  .motd <- ""
+  .mark <- ""
+
+  r <- getOption("repos")
+  r["CRAN"] <- "https://cran.rstudio.com/"
+  options(repos = r)
+  # options("device" = "quartz")
+  options(stringsAsFactors = FALSE)
+  options(Ncpus = max(parallel::detectCores(), 1))
+
+  if (interactive()) {
+    user <- as.character(Sys.info()["user"])
+    host <- as.character(Sys.info()["nodename"])
+    host <- gsub(".local", "", host)
+    if (.mark != "") .mark <- paste0("[", .mark, "]:")
+    rver <- paste(R.Version()$major, R.Version()$minor, sep = ".")
+    prmt <- ">"
+    if (Sys.getenv("TERM") == "xterm-256color") {
+      .mark <- paste0("[36m", .mark, "[35m", user,
+                      "[91m@[0m", host)
+      .motd <- paste0("[35m", .motd, "[0m")
+      # prmt <- paste0("[36m", prmt, "[0m ")
+    } else {
+      .mark <- paste0(.mark, user, "@", host)
+    }
+    options(prompt = paste0(prmt, " "))
+    options(.mark = .mark, .motd = .motd)
+  }
+})
+
+utils::rc.settings(ipck = TRUE)
+
+
+.First <- function() {
+  if (interactive()) {
+    if (suppressMessages(suppressWarnings(require("shortcuts"))))
+      shortcuts::cls()
+    .mark <- getOption(".mark")
+    .motd <- getOption(".motd")
+    rver <- paste(R.Version()$major, R.Version()$minor, sep = ".")
+    cat(.mark, "\n", sep = "")
+    cat(paste("#--[[95mR [36m", rver, "[0m]---[[93m",
+              getwd(), "[0m] [94m", Sys.time(), "[0m--#",
+              sep = ""))
+    utils::timestamp(
+      stamp = Sys.time(),
+      prefix = paste("#--[R ", rver, "]---[", getwd(), "]", sep = ""),
+      suffix = "--#", quiet = TRUE)
+    if (.motd != "") cat(.motd, "\n")
+    options(.mark = NULL, .motd = NULL)
+    if (suppressMessages(suppressWarnings(require("shortcuts"))))
+      shortcuts::lh()
+    suppressMessages(suppressWarnings(require("lintr")))
+    suppressMessages(suppressWarnings(require("colorout")))
+    if ("prettycode" %in% rownames(utils::installed.packages()))
+      suppressMessages(prettycode::prettycode())
+  }
+}
+
+.Last <- function() {
+  if (suppressMessages(suppressWarnings(require("shortcuts"))))
+    shortcuts::sh()
+}
